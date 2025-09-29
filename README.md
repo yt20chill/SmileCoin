@@ -22,6 +22,7 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 ## 📱 How It Works
 
 ### For Tourists
+
 1. **Register** with your travel details (origin country, arrival/departure dates)
 2. **Receive** 10 smile coins daily during your Hong Kong visit
 3. **Discover** nearby restaurants through GPS and Google Maps integration
@@ -29,6 +30,7 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 5. **Earn** a physical smile coin souvenir by giving all coins daily
 
 ### For Restaurants
+
 1. **Register** your restaurant using Google Maps Place ID
 2. **Display** your unique QR code for tourists to scan
 3. **Receive** smile coins from satisfied customers
@@ -38,6 +40,7 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 ## 🏗️ Technical Architecture
 
 ### Mobile App (React Native + NativeWind)
+
 - **Dashboard**: Overall restaurant rankings and statistics
 - **Nearby**: GPS-based restaurant discovery with Google Maps
 - **Recommendations**: Restaurants popular with your countrymen
@@ -45,18 +48,21 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 - **Profile**: Coin balance, transaction history, souvenir progress
 
 ### Restaurant Web Dashboard (React + Tailwind CSS)
+
 - **Analytics**: Daily coin statistics and performance trends
 - **Origins**: Tourist country breakdown and demographics
 - **Rankings**: Position among all Hong Kong restaurants
 - **Blockchain**: Direct links to verify all transactions
 
 ### Backend (Node.js + Express)
+
 - **Authentication**: JWT-based user management
 - **Google Maps**: Restaurant discovery and location services
 - **Blockchain**: Smart contract integration for coin transactions
 - **Analytics**: Real-time ranking and statistics calculation
 
 ### Blockchain (Ethereum/Testnet)
+
 - **Smart Contracts**: Automated coin distribution and expiration
 - **Transparency**: All transactions publicly verifiable
 - **Security**: Immutable records prevent manipulation
@@ -65,6 +71,7 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 ## 🎯 Demo Features
 
 ### Core Functionality
+
 - ✅ User registration with travel details
 - ✅ Daily blockchain-verified coin distribution
 - ✅ GPS restaurant discovery with Google Maps
@@ -73,6 +80,7 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 - ✅ Restaurant rankings and analytics
 
 ### Blockchain Innovation Showcase
+
 - ✅ Live blockchain transaction creation during demo
 - ✅ Smart contract automation (coin expiration, validation)
 - ✅ Blockchain explorer links for transaction verification
@@ -81,23 +89,27 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 ## 🛠️ Technology Stack
 
 **Frontend**
+
 - React Native with NativeWind (Tailwind CSS)
 - React.js with Tailwind CSS for web dashboard
 - React Navigation, React Native Maps, QR Scanner
 
 **Backend**
+
 - Node.js with Express.js
 - PostgreSQL with Redis caching
 - Google Maps Places API
 - JWT authentication
 
 **Blockchain**
+
 - Ethereum testnet (Goerli/Sepolia)
 - Solidity smart contracts
 - Web3.js for blockchain interaction
 - MetaMask or custom wallet integration
 
 **Development**
+
 - Docker Compose for local databases
 - Localhost development environment
 - Hot reloading for rapid development
@@ -105,6 +117,7 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 ## 🏃‍♂️ Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - Docker and Docker Compose
 - React Native development environment
@@ -112,6 +125,7 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 - Ethereum testnet access
 
 ### Setup
+
 ```bash
 # Clone the repository
 git clone <repository-url>
@@ -163,12 +177,14 @@ tourist-rewards-system/
 ## 🌍 Impact & Vision
 
 ### For Hong Kong Tourism
+
 - **Quality Assurance**: Transparent restaurant quality metrics
 - **Tourist Satisfaction**: Gamified way to reward good service
 - **Data Insights**: Real tourism patterns and preferences
 - **Local Business Support**: Drive traffic to quality establishments
 
 ### Blockchain Innovation
+
 - **Real-world Utility**: Practical blockchain application beyond speculation
 - **Transparency**: Public, verifiable reputation system
 - **Automation**: Smart contracts handle complex business logic
@@ -177,6 +193,7 @@ tourist-rewards-system/
 ## 🏆 Hackathon Achievement
 
 Built in 36 hours by a 4-person team with Kiro AI assistance, this project demonstrates:
+
 - **Rapid Blockchain Development**: From concept to working dApp
 - **Full-stack Integration**: Mobile, web, backend, and blockchain
 - **Real-world Application**: Solving actual tourism industry challenges
