@@ -235,7 +235,7 @@ GET /api/restaurants/{id}
 GET /api/restaurants/rankings/global  // Overall rankings for dashboard
 GET /api/restaurants/rankings/origin?country={country}  // Origin-based recommendations
 POST /api/restaurants/{id}/coins
-POST /api/restaurants/rankings/refresh  // Manual refresh for demo
+
 
 // Restaurant Web Dashboard
 GET /api/restaurants/{id}/dashboard/stats  // Daily, total stats
