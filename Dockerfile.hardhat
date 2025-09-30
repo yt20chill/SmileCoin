@@ -1,0 +1,24 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY hardhat.config.ts ./
+COPY tsconfig.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy contracts and scripts
+COPY contracts/ ./contracts/
+COPY scripts/ ./scripts/
+
+# Install hardhat globally for convenience
+RUN npm install -g hardhat
+
+# Expose hardhat node port
+EXPOSE 8545
+
+# Default command (can be overridden)
+CMD ["npx", "hardhat", "node", "--hostname", "0.0.0.0"]

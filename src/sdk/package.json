@@ -1,0 +1,57 @@
+{
+  "name": "@smilecoin/sdk",
+  "version": "1.0.0",
+  "description": "JavaScript SDK for the SmileCoin Tourist Rewards Blockchain Infrastructure",
+  "main": "SmileCoinSDK.js",
+  "types": "SmileCoinSDK.d.ts",
+  "files": [
+    "SmileCoinSDK.js",
+    "SmileCoinSDK.d.ts",
+    "examples.js",
+    "examples.d.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "examples": "node examples.js",
+    "lint": "eslint *.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "blockchain",
+    "tourism",
+    "rewards",
+    "cryptocurrency",
+    "polygon",
+    "erc20",
+    "sdk",
+    "api"
+  ],
+  "author": "SmileCoin Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smilecoin/sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/smilecoin/sdk/issues"
+  },
+  "homepage": "https://docs.smilecoin.example.com",
+  "dependencies": {},
+  "peerDependencies": {
+    "typescript": "^4.0.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
