@@ -7,6 +7,9 @@ export interface ApiResponse<T = any> {
   message?: string;
 }
 
+// Re-export Google Maps types
+export * from './googleMaps';
+
 export interface PaginationParams {
   page?: number;
   limit?: number;

@@ -19,3 +19,11 @@ export class Logger {
     }
   }
 }
+
+// Export a logger instance for convenience
+export const logger = {
+  info: Logger.info,
+  error: Logger.error,
+  warn: Logger.warn,
+  debug: Logger.debug,
+};

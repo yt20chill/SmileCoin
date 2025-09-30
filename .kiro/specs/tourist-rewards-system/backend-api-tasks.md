@@ -32,7 +32,7 @@ This task list covers the backend API endpoints for users and restaurants, exclu
   - Implement user session management with Redis
   - _Focus: Privacy-first user management_
 
-- [ ] 4. Google Maps API Integration Service
+- [x] 4. Google Maps API Integration Service
 
   - Set up Google Maps Places API configuration and error handling
   - Create nearby restaurants search endpoint using GPS coordinates and radius
@@ -42,7 +42,7 @@ This task list covers the backend API endpoints for users and restaurants, exclu
   - Create distance calculation utilities for restaurant ranking
   - _Focus: Restaurant discovery and location services_
 
-- [ ] 5. Restaurant Management Endpoints
+- [-] 5. Restaurant Management Endpoints
 
   - Create restaurant registration endpoint using Google Place ID
   - Generate unique QR codes containing Place ID and wallet address
