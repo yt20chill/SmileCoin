@@ -3,7 +3,9 @@ import "@nomicfoundation/hardhat-toolbox";
 import "@openzeppelin/hardhat-upgrades";
 import dotenv from "dotenv";
 
-dotenv.config();
+// Load environment based on NODE_ENV or default to development
+const envFile = process.env.NODE_ENV === 'staging' ? '.env.staging' : '.env.development';
+dotenv.config({ path: envFile });
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -34,6 +36,13 @@ const config: HardhatUserConfig = {
       gasPrice: 20000000000, // 20 gwei
       timeout: 60000,
     },
+    "polygon-amoy": {
+      url: process.env.POLYGON_AMOY_RPC_URL || "https://rpc-amoy.polygon.technology",
+      accounts: process.env.ADMIN_PRIVATE_KEY ? [process.env.ADMIN_PRIVATE_KEY] : [],
+      chainId: 80002,
+      gasPrice: 30000000000, // 30 gwei (minimum for Amoy)
+      timeout: 60000,
+    },
     polygon: {
       url: process.env.POLYGON_RPC_URL || "https://polygon-rpc.com",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
@@ -45,6 +54,7 @@ const config: HardhatUserConfig = {
     apiKey: {
       polygon: process.env.POLYGONSCAN_API_KEY || "",
       polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
+      polygonAmoy: process.env.POLYGONSCAN_API_KEY || "",
     },
   },
   gasReporter: {

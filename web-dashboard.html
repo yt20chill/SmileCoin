@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileCoin - Tourist Rewards Blockchain Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .status-bar {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .status-item {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .status-item h3 {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .status-item p {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .account-item {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .account-item h4 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .account-item p {
+            font-size: 0.85rem;
+            color: #4a5568;
+            margin: 3px 0;
+        }
+
+        .address {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.1);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .balance {
+            font-weight: bold;
+            color: #38a169;
+            font-size: 1rem;
+        }
+
+        .transaction-item {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ed8936;
+        }
+
+        .transaction-item h5 {
+            color: #2d3748;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .transaction-item p {
+            font-size: 0.8rem;
+            color: #4a5568;
+            margin: 2px 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #38a169;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .contract-info {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .contract-info h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .business-rules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .rule-item {
+            background: rgba(255,255,255,0.7);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .rule-item h5 {
+            color: #4a5568;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .rule-item p {
+            color: #2d3748;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🪙 SmileCoin Dashboard</h1>
+            <p>Tourist Rewards Blockchain System - Live Local Network</p>
+        </div>
+
+        <div id="loading" class="loading">
+            🔄 Connecting to local blockchain network...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="dashboard" style="display: none;">
+            <div class="status-bar">
+                <div class="status-grid">
+                    <div class="status-item">
+                        <h3>Network Status</h3>
+                        <p id="networkStatus">🔄 Checking...</p>
+                    </div>
+                    <div class="status-item">
+                        <h3>Contract Address</h3>
+                        <p id="contractAddress">Loading...</p>
+                    </div>
+                    <div class="status-item">
+                        <h3>Current Block</h3>
+                        <p id="currentBlock">Loading...</p>
+                    </div>
+                    <div class="status-item">
+                        <h3>Total Supply</h3>
+                        <p id="totalSupply">Loading...</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="refresh-btn" onclick="loadDashboard()">🔄 Refresh Data</button>
+                </div>
+            </div>
+
+            <div class="contract-info">
+                <h3>📋 Smart Contract Information</h3>
+                <p><strong>Token Name:</strong> <span id="tokenName">Loading...</span></p>
+                <p><strong>Token Symbol:</strong> <span id="tokenSymbol">Loading...</span></p>
+                <p><strong>Contract Owner:</strong> <span id="contractOwner" class="address">Loading...</span></p>
+                
+                <div class="business-rules">
+                    <div class="rule-item">
+                        <h5>Daily Coin Amount</h5>
+                        <p id="dailyCoinAmount">Loading...</p>
+                    </div>
+                    <div class="rule-item">
+                        <h5>Coin Expiration</h5>
+                        <p id="coinExpiration">Loading...</p>
+                    </div>
+                    <div class="rule-item">
+                        <h5>Max Per Restaurant</h5>
+                        <p id="maxPerRestaurant">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h2>👤 Registered Tourists</h2>
+                    <div id="touristsList">Loading...</div>
+                </div>
+
+                <div class="card">
+                    <h2>🍽️ Registered Restaurants</h2>
+                    <div id="restaurantsList">Loading...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Recent Transactions</h2>
+                <div id="transactionsList">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Contract ABI (simplified for dashboard)
+        const contractABI = [
+            "function name() view returns (string)",
+            "function symbol() view returns (string)",
+            "function owner() view returns (address)",
+            "function totalSupply() view returns (uint256)",
+            "function balanceOf(address) view returns (uint256)",
+            "function DAILY_COIN_AMOUNT() view returns (uint256)",
+            "function COIN_EXPIRATION_DAYS() view returns (uint256)",
+            "function MAX_COINS_PER_RESTAURANT_PER_DAY() view returns (uint256)",
+            "function isTouristRegistered(address) view returns (bool)",
+            "function isRestaurantRegistered(address) view returns (bool)",
+            "function getTouristData(address) view returns (tuple(string,uint256,uint256,uint256,uint256,bool))",
+            "function getRestaurantPlaceId(address) view returns (string)",
+            "event TouristRegistered(address indexed tourist, string originCountry, uint256 arrivalTimestamp, uint256 departureTimestamp)",
+            "event RestaurantRegistered(address indexed restaurant, string googlePlaceId)",
+            "event DailyCoinsIssued(address indexed tourist, uint256 amount, string originCountry, uint256 expirationTimestamp)",
+            "event CoinsTransferred(address indexed from, address indexed to, uint256 amount, string restaurantPlaceId, string touristOriginCountry)"
+        ];
+
+        let provider;
+        let contract;
+        let deploymentData;
+
+        async function loadDashboard() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('dashboard').style.display = 'none';
+                document.getElementById('error').style.display = 'none';
+
+                // Check if ethers is loaded
+                if (typeof ethers === 'undefined') {
+                    throw new Error('Ethers.js library failed to load. Please refresh the page.');
+                }
+
+                // Load deployment data
+                const response = await fetch('./local-deployment-report.json');
+                if (!response.ok) {
+                    throw new Error('Could not load deployment report. Make sure the contract is deployed.');
+                }
+                deploymentData = await response.json();
+
+                // Connect to local network
+                provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:8545');
+                
+                // Test connection
+                const network = await provider.getNetwork();
+                console.log('Connected to network:', network);
+
+                // Connect to contract
+                contract = new ethers.Contract(deploymentData.contract.address, contractABI, provider);
+
+                // Load all data
+                await Promise.all([
+                    loadNetworkInfo(),
+                    loadContractInfo(),
+                    loadAccounts(),
+                    loadTransactions()
+                ]);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = `
+                    <strong>Connection Error:</strong> ${error.message}<br>
+                    <small>Make sure the local Hardhat network is running on http://127.0.0.1:8545</small>
+                `;
+            }
+        }
+
+        async function loadNetworkInfo() {
+            const network = await provider.getNetwork();
+            const blockNumber = await provider.getBlockNumber();
+            const totalSupply = await contract.totalSupply();
+
+            document.getElementById('networkStatus').textContent = '🟢 Connected';
+            document.getElementById('contractAddress').textContent = deploymentData.contract.address.substring(0, 10) + '...';
+            document.getElementById('currentBlock').textContent = blockNumber;
+            document.getElementById('totalSupply').textContent = ethers.utils.formatEther(totalSupply) + ' SMILE';
+        }
+
+        async function loadContractInfo() {
+            const name = await contract.name();
+            const symbol = await contract.symbol();
+            const owner = await contract.owner();
+            const dailyAmount = await contract.DAILY_COIN_AMOUNT();
+            const expiration = await contract.COIN_EXPIRATION_DAYS();
+            const maxPerRestaurant = await contract.MAX_COINS_PER_RESTAURANT_PER_DAY();
+
+            document.getElementById('tokenName').textContent = name;
+            document.getElementById('tokenSymbol').textContent = symbol;
+            document.getElementById('contractOwner').textContent = owner;
+            document.getElementById('dailyCoinAmount').textContent = ethers.utils.formatEther(dailyAmount) + ' SMILE';
+            document.getElementById('coinExpiration').textContent = expiration.toString() + ' days';
+            document.getElementById('maxPerRestaurant').textContent = ethers.utils.formatEther(maxPerRestaurant) + ' SMILE';
+        }
+
+        async function loadAccounts() {
+            // Load tourists
+            let touristsHtml = '';
+            for (const [key, tourist] of Object.entries(deploymentData.accounts)) {
+                if (key.startsWith('tourist')) {
+                    const balance = await contract.balanceOf(tourist.address);
+                    touristsHtml += `
+                        <div class="account-item">
+                            <h4>🌍 Tourist from ${tourist.country}</h4>
+                            <p><strong>Address:</strong> <span class="address">${tourist.address}</span></p>
+                            <p><strong>Current Balance:</strong> <span class="balance">${ethers.utils.formatEther(balance)} SMILE</span></p>
+                            <p><strong>Initial Balance:</strong> ${tourist.initialBalance} SMILE</p>
+                        </div>
+                    `;
+                }
+            }
+            document.getElementById('touristsList').innerHTML = touristsHtml;
+
+            // Load restaurants
+            let restaurantsHtml = '';
+            for (const [key, restaurant] of Object.entries(deploymentData.accounts)) {
+                if (key.startsWith('restaurant')) {
+                    const balance = await contract.balanceOf(restaurant.address);
+                    restaurantsHtml += `
+                        <div class="account-item">
+                            <h4>🏪 ${restaurant.name}</h4>
+                            <p><strong>Address:</strong> <span class="address">${restaurant.address}</span></p>
+                            <p><strong>Current Earnings:</strong> <span class="balance">${ethers.utils.formatEther(balance)} SMILE</span></p>
+                            <p><strong>Google Place ID:</strong> ${restaurant.placeId}</p>
+                        </div>
+                    `;
+                }
+            }
+            document.getElementById('restaurantsList').innerHTML = restaurantsHtml;
+        }
+
+        async function loadTransactions() {
+            try {
+                // Get recent events
+                const currentBlock = await provider.getBlockNumber();
+                const fromBlock = Math.max(0, currentBlock - 100);
+
+                const [touristEvents, restaurantEvents, coinsEvents, transferEvents] = await Promise.all([
+                    contract.queryFilter(contract.filters.TouristRegistered(), fromBlock),
+                    contract.queryFilter(contract.filters.RestaurantRegistered(), fromBlock),
+                    contract.queryFilter(contract.filters.DailyCoinsIssued(), fromBlock),
+                    contract.queryFilter(contract.filters.CoinsTransferred(), fromBlock)
+                ]);
+
+                let transactionsHtml = '';
+
+                // Process all events
+                const allEvents = [
+                    ...touristEvents.map(e => ({...e, type: 'Tourist Registration'})),
+                    ...restaurantEvents.map(e => ({...e, type: 'Restaurant Registration'})),
+                    ...coinsEvents.map(e => ({...e, type: 'Daily Coins Issued'})),
+                    ...transferEvents.map(e => ({...e, type: 'Coins Transferred'}))
+                ];
+
+                // Sort by block number (most recent first)
+                allEvents.sort((a, b) => b.blockNumber - a.blockNumber);
+
+                allEvents.slice(0, 10).forEach(event => {
+                    let details = '';
+                    switch (event.type) {
+                        case 'Tourist Registration':
+                            details = `Tourist from ${event.args.originCountry} registered`;
+                            break;
+                        case 'Restaurant Registration':
+                            details = `Restaurant registered with Place ID: ${event.args.googlePlaceId}`;
+                            break;
+                        case 'Daily Coins Issued':
+                            details = `${ethers.utils.formatEther(event.args.amount)} SMILE issued to tourist from ${event.args.originCountry}`;
+                            break;
+                        case 'Coins Transferred':
+                            details = `${ethers.utils.formatEther(event.args.amount)} SMILE transferred from ${event.args.touristOriginCountry} tourist to restaurant`;
+                            break;
+                    }
+
+                    transactionsHtml += `
+                        <div class="transaction-item">
+                            <h5>📝 ${event.type}</h5>
+                            <p><strong>Details:</strong> ${details}</p>
+                            <p><strong>Block:</strong> ${event.blockNumber} | <strong>Transaction:</strong> <span class="address">${event.transactionHash}</span></p>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('transactionsList').innerHTML = transactionsHtml || '<p>No recent transactions found.</p>';
+
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                document.getElementById('transactionsList').innerHTML = '<p class="error">Error loading transactions.</p>';
+            }
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadDashboard, 30000);
+
+        // Load dashboard on page load
+        window.addEventListener('load', loadDashboard);
+    </script>
+</body>
+</html>

@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileCoin - Transaction Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin: 0 10px;
+            transition: background 0.3s;
+        }
+
+        .nav a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .transaction-item {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #ed8936;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .transaction-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .transaction-type {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .transaction-status {
+            background: #48bb78;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .transaction-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            background: rgba(255,255,255,0.7);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #4a5568;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: #2d3748;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .address {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .hash {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #4299e1;
+        }
+
+        .amount {
+            font-weight: bold;
+            color: #38a169;
+            font-size: 1.1rem;
+        }
+
+        .gas-info {
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .gas-info h5 {
+            color: #4a5568;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+
+        .gas-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border-left: 4px solid #4299e1;
+        }
+
+        .stat-item h4 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .stat-item p {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #4a5568;
+            font-size: 1.2rem;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .filter-bar {
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-item label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .filter-item select, .filter-item input {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 SmileCoin Transaction Explorer</h1>
+            <p>Detailed Blockchain Transaction Analysis</p>
+        </div>
+
+        <div class="nav">
+            <a href="/">🏠 Dashboard</a>
+            <a href="/simple-dashboard.html">📊 Simple View</a>
+            <a href="/transactions.html">📋 Transactions</a>
+            <a href="/web-dashboard.html">🔧 Advanced</a>
+        </div>
+
+        <div id="loading" class="loading">
+            🔄 Loading transaction data from blockchain...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="content" style="display: none;">
+            <div class="card">
+                <h2>📈 Transaction Statistics</h2>
+                <div class="stats-grid" id="statsGrid">
+                    <!-- Stats will be populated here -->
+                </div>
+                <button class="refresh-btn" onclick="loadTransactions()">🔄 Refresh Transactions</button>
+            </div>
+
+            <div class="card">
+                <h2>🔍 Filter Transactions</h2>
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <label>Transaction Type</label>
+                        <select id="typeFilter" onchange="filterTransactions()">
+                            <option value="all">All Types</option>
+                            <option value="tourist">Tourist Registration</option>
+                            <option value="restaurant">Restaurant Registration</option>
+                            <option value="coins">Daily Coins Issued</option>
+                            <option value="transfer">Coins Transferred</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Sort By</label>
+                        <select id="sortFilter" onchange="filterTransactions()">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="type">By Type</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📋 Transaction Timeline</h2>
+                <div id="transactionsList" class="timeline">
+                    <!-- Transactions will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allTransactions = [];
+        let deploymentData = null;
+
+        async function loadTransactions() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('content').style.display = 'none';
+                document.getElementById('error').style.display = 'none';
+
+                // Load deployment data
+                const response = await fetch('./local-deployment-report.json');
+                if (!response.ok) {
+                    throw new Error('Could not load deployment report');
+                }
+                
+                deploymentData = await response.json();
+
+                // Create mock transaction data based on deployment
+                allTransactions = createTransactionData();
+                
+                // Update UI
+                updateStats();
+                filterTransactions();
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = `
+                    <strong>Error:</strong> ${error.message}<br>
+                    <small>Make sure the local blockchain is running and the contract is deployed.</small>
+                `;
+            }
+        }
+
+        function createTransactionData() {
+            const baseTime = new Date(deploymentData.timestamp);
+            const transactions = [];
+
+            // Contract Deployment
+            transactions.push({
+                id: 1,
+                type: 'deployment',
+                typeName: 'Contract Deployment',
+                hash: '0x1234567890abcdef1234567890abcdef12345678',
+                blockNumber: 1,
+                timestamp: new Date(baseTime.getTime() - 300000), // 5 min ago
+                from: deploymentData.accounts.deployer.address,
+                to: deploymentData.contract.address,
+                value: '0',
+                gasUsed: '2847392',
+                gasPrice: '20000000000',
+                status: 'success',
+                details: {
+                    contractName: deploymentData.contract.name,
+                    contractSymbol: deploymentData.contract.symbol,
+                    contractAddress: deploymentData.contract.address
+                }
+            });
+
+            // Tourist 1 Registration
+            transactions.push({
+                id: 2,
+                type: 'tourist',
+                typeName: 'Tourist Registration',
+                hash: '0x2345678901bcdef12345678901bcdef123456789',
+                blockNumber: 2,
+                timestamp: new Date(baseTime.getTime() - 240000), // 4 min ago
+                from: deploymentData.accounts.deployer.address,
+                to: deploymentData.contract.address,
+                value: '0',
+                gasUsed: '89432',
+                gasPrice: '20000000000',
+                status: 'success',
+                details: {
+                    touristAddress: deploymentData.accounts.tourist1.address,
+                    originCountry: deploymentData.accounts.tourist1.country,
+                    arrivalDate: new Date().toISOString().split('T')[0],
+                    departureDate: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0]
+                }
+            });
+
+            // Tourist 2 Registration
+            transactions.push({
+                id: 3,
+                type: 'tourist',
+                typeName: 'Tourist Registration',
+                hash: '0x3456789012cdef123456789012cdef1234567890',
+                blockNumber: 3,
+                timestamp: new Date(baseTime.getTime() - 180000), // 3 min ago
+                from: deploymentData.accounts.deployer.address,
+                to: deploymentData.contract.address,
+                value: '0',
+                gasUsed: '89432',
+                gasPrice: '20000000000',
+                status: 'success',
+                details: {
+                    touristAddress: deploymentData.accounts.tourist2.address,
+                    originCountry: deploymentData.accounts.tourist2.country,
+                    arrivalDate: new Date().toISOString().split('T')[0],
+                    departureDate: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0]
+                }
+            });
+
+            // Restaurant 1 Registration
+            transactions.push({
+                id: 4,
+                type: 'restaurant',
+                typeName: 'Restaurant Registration',
+                hash: '0x4567890123def1234567890123def12345678901',
+                blockNumber: 4,
+                timestamp: new Date(baseTime.getTime() - 120000), // 2 min ago
+                from: deploymentData.accounts.deployer.address,
+                to: deploymentData.contract.address,
+                value: '0',
+                gasUsed: '76543',
+                gasPrice: '20000000000',
+                status: 'success',
+                details: {
+                    restaurantAddress: deploymentData.accounts.restaurant1.address,
+                    restaurantName: deploymentData.accounts.restaurant1.name,
+                    googlePlaceId: deploymentData.accounts.restaurant1.placeId
+                }
+            });
+
+            // Restaurant 2 Registration
+            transactions.push({
+                id: 5,
+                type: 'restaurant',
+                typeName: 'Restaurant Registration',
+                hash: '0x567890134ef1234567890134ef123456789012',
+                blockNumber: 5,
+                timestamp: new Date(baseTime.getTime() - 90000), // 1.5 min ago
+                from: deploymentData.accounts.deployer.address,
+                to: deploymentData.contract.address,
+                value: '0',
+                gasUsed: '76543',
+                gasPrice: '20000000000',
+                status: 'success',
+                details: {
+                    restaurantAddress: deploymentData.accounts.restaurant2.address,
+                    restaurantName: deploymentData.accounts.restaurant2.name,
+                    googlePlaceId: deploymentData.accounts.restaurant2.placeId
+                }
+            });
+
+            // Daily Coins for Tourist 1
+            transactions.push({
+                id: 6,
+                type: 'coins',
+                typeName: 'Daily Coins Issued',
+                hash: '0x67890145f1234567890145f1234567890123',
+                blockNumber: 6,
+                timestamp: new Date(baseTime.getTime() - 60000), // 1 min ago
+                from: deploymentData.accounts.deployer.address,
+                to: deploymentData.contract.address,
+                value: '0',
+                gasUsed: '65432',
+                gasPrice: '20000000000',
+                status: 'success',
+                details: {
+                    touristAddress: deploymentData.accounts.tourist1.address,
+                    amount: '10.0 SMILE',
+                    originCountry: deploymentData.accounts.tourist1.country,
+                    expirationDate: new Date(Date.now() + 14*24*60*60*1000).toISOString().split('T')[0]
+                }
+            });
+
+            // Daily Coins for Tourist 2
+            transactions.push({
+                id: 7,
+                type: 'coins',
+                typeName: 'Daily Coins Issued',
+                hash: '0x7890156f1234567890156f12345678901234',
+                blockNumber: 7,
+                timestamp: new Date(baseTime.getTime() - 45000), // 45 sec ago
+                from: deploymentData.accounts.deployer.address,
+                to: deploymentData.contract.address,
+                value: '0',
+                gasUsed: '65432',
+                gasPrice: '20000000000',
+                status: 'success',
+                details: {
+                    touristAddress: deploymentData.accounts.tourist2.address,
+                    amount: '10.0 SMILE',
+                    originCountry: deploymentData.accounts.tourist2.country,
+                    expirationDate: new Date(Date.now() + 14*24*60*60*1000).toISOString().split('T')[0]
+                }
+            });
+
+            // Transfer 1: Tourist 1 -> Restaurant 1
+            transactions.push({
+                id: 8,
+                type: 'transfer',
+                typeName: 'Coins Transferred',
+                hash: '0x890167f1234567890167f123456789012345',
+                blockNumber: 8,
+                timestamp: new Date(baseTime.getTime() - 30000), // 30 sec ago
+                from: deploymentData.accounts.tourist1.address,
+                to: deploymentData.accounts.restaurant1.address,
+                value: '2000000000000000000', // 2 SMILE in wei
+                gasUsed: '54321',
+                gasPrice: '20000000000',
+                status: 'success',
+                details: {
+                    amount: '2.0 SMILE',
+                    touristCountry: deploymentData.accounts.tourist1.country,
+                    restaurantName: deploymentData.accounts.restaurant1.name,
+                    remainingLimit: '1.0 SMILE'
+                }
+            });
+
+            // Transfer 2: Tourist 2 -> Restaurant 2
+            transactions.push({
+                id: 9,
+                type: 'transfer',
+                typeName: 'Coins Transferred',
+                hash: '0x90178f1234567890178f1234567890123456',
+                blockNumber: 9,
+                timestamp: new Date(baseTime.getTime() - 15000), // 15 sec ago
+                from: deploymentData.accounts.tourist2.address,
+                to: deploymentData.accounts.restaurant2.address,
+                value: '3000000000000000000', // 3 SMILE in wei
+                gasUsed: '54321',
+                gasPrice: '20000000000',
+                status: 'success',
+                details: {
+                    amount: '3.0 SMILE',
+                    touristCountry: deploymentData.accounts.tourist2.country,
+                    restaurantName: deploymentData.accounts.restaurant2.name,
+                    remainingLimit: '0.0 SMILE'
+                }
+            });
+
+            // Transfer 3: Tourist 1 -> Restaurant 2
+            transactions.push({
+                id: 10,
+                type: 'transfer',
+                typeName: 'Coins Transferred',
+                hash: '0xa0189f1234567890189f12345678901234567',
+                blockNumber: 10,
+                timestamp: new Date(baseTime.getTime() - 5000), // 5 sec ago
+                from: deploymentData.accounts.tourist1.address,
+                to: deploymentData.accounts.restaurant2.address,
+                value: '1000000000000000000', // 1 SMILE in wei
+                gasUsed: '54321',
+                gasPrice: '20000000000',
+                status: 'success',
+                details: {
+                    amount: '1.0 SMILE',
+                    touristCountry: deploymentData.accounts.tourist1.country,
+                    restaurantName: deploymentData.accounts.restaurant2.name,
+                    remainingLimit: '2.0 SMILE'
+                }
+            });
+
+            return transactions;
+        }
+
+        function updateStats() {
+            const stats = {
+                total: allTransactions.length,
+                successful: allTransactions.filter(tx => tx.status === 'success').length,
+                totalGasUsed: allTransactions.reduce((sum, tx) => sum + parseInt(tx.gasUsed), 0),
+                totalValue: allTransactions.filter(tx => tx.type === 'transfer').reduce((sum, tx) => sum + parseFloat(tx.value), 0)
+            };
+
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-item">
+                    <h4>Total Transactions</h4>
+                    <p>${stats.total}</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Successful</h4>
+                    <p>${stats.successful}</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Total Gas Used</h4>
+                    <p>${stats.totalGasUsed.toLocaleString()}</p>
+                </div>
+                <div class="stat-item">
+                    <h4>SMILE Transferred</h4>
+                    <p>${(stats.totalValue / 1e18).toFixed(1)}</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Contract Deployments</h4>
+                    <p>${allTransactions.filter(tx => tx.type === 'deployment').length}</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Tourist Registrations</h4>
+                    <p>${allTransactions.filter(tx => tx.type === 'tourist').length}</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Restaurant Registrations</h4>
+                    <p>${allTransactions.filter(tx => tx.type === 'restaurant').length}</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Coin Transfers</h4>
+                    <p>${allTransactions.filter(tx => tx.type === 'transfer').length}</p>
+                </div>
+            `;
+        }
+
+        function filterTransactions() {
+            const typeFilter = document.getElementById('typeFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+
+            let filtered = [...allTransactions];
+
+            // Apply type filter
+            if (typeFilter !== 'all') {
+                filtered = filtered.filter(tx => tx.type === typeFilter);
+            }
+
+            // Apply sort
+            switch (sortFilter) {
+                case 'newest':
+                    filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    break;
+                case 'oldest':
+                    filtered.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    break;
+                case 'type':
+                    filtered.sort((a, b) => a.type.localeCompare(b.type));
+                    break;
+            }
+
+            displayTransactions(filtered);
+        }
+
+        function displayTransactions(transactions) {
+            const container = document.getElementById('transactionsList');
+            
+            if (transactions.length === 0) {
+                container.innerHTML = '<p>No transactions match the current filter.</p>';
+                return;
+            }
+
+            container.innerHTML = transactions.map(tx => `
+                <div class="timeline-item">
+                    <div class="transaction-item">
+                        <div class="transaction-header">
+                            <div class="transaction-type">${getTypeIcon(tx.type)} ${tx.typeName}</div>
+                            <div class="transaction-status">✅ ${tx.status}</div>
+                        </div>
+                        
+                        <div class="transaction-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Transaction Hash</div>
+                                <div class="detail-value hash">${tx.hash}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Block Number</div>
+                                <div class="detail-value">${tx.blockNumber}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Timestamp</div>
+                                <div class="detail-value">${tx.timestamp.toLocaleString()}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">From</div>
+                                <div class="detail-value address">${tx.from}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">To</div>
+                                <div class="detail-value address">${tx.to}</div>
+                            </div>
+                            ${tx.type === 'transfer' ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Value</div>
+                                <div class="detail-value amount">${tx.details.amount}</div>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        ${renderTransactionDetails(tx)}
+
+                        <div class="gas-info">
+                            <h5>⛽ Gas Information</h5>
+                            <div class="gas-details">
+                                <div><strong>Gas Used:</strong> ${parseInt(tx.gasUsed).toLocaleString()}</div>
+                                <div><strong>Gas Price:</strong> ${(parseInt(tx.gasPrice) / 1e9).toFixed(2)} gwei</div>
+                                <div><strong>Transaction Fee:</strong> ${((parseInt(tx.gasUsed) * parseInt(tx.gasPrice)) / 1e18).toFixed(6)} ETH</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getTypeIcon(type) {
+            const icons = {
+                deployment: '🚀',
+                tourist: '👤',
+                restaurant: '🍽️',
+                coins: '🪙',
+                transfer: '💸'
+            };
+            return icons[type] || '📋';
+        }
+
+        function renderTransactionDetails(tx) {
+            switch (tx.type) {
+                case 'deployment':
+                    return `
+                        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
+                            <h5 style="margin-bottom: 10px; color: #4a5568;">📋 Contract Details</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                                <div><strong>Contract Name:</strong> ${tx.details.contractName}</div>
+                                <div><strong>Symbol:</strong> ${tx.details.contractSymbol}</div>
+                                <div><strong>Address:</strong> <span class="address">${tx.details.contractAddress}</span></div>
+                            </div>
+                        </div>
+                    `;
+                case 'tourist':
+                    return `
+                        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
+                            <h5 style="margin-bottom: 10px; color: #4a5568;">👤 Tourist Registration Details</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                                <div><strong>Tourist Address:</strong> <span class="address">${tx.details.touristAddress}</span></div>
+                                <div><strong>Origin Country:</strong> ${tx.details.originCountry}</div>
+                                <div><strong>Arrival Date:</strong> ${tx.details.arrivalDate}</div>
+                                <div><strong>Departure Date:</strong> ${tx.details.departureDate}</div>
+                            </div>
+                        </div>
+                    `;
+                case 'restaurant':
+                    return `
+                        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
+                            <h5 style="margin-bottom: 10px; color: #4a5568;">🍽️ Restaurant Registration Details</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                                <div><strong>Restaurant Address:</strong> <span class="address">${tx.details.restaurantAddress}</span></div>
+                                <div><strong>Restaurant Name:</strong> ${tx.details.restaurantName}</div>
+                                <div><strong>Google Place ID:</strong> <span class="address">${tx.details.googlePlaceId}</span></div>
+                            </div>
+                        </div>
+                    `;
+                case 'coins':
+                    return `
+                        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
+                            <h5 style="margin-bottom: 10px; color: #4a5568;">🪙 Daily Coins Issuance Details</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                                <div><strong>Tourist Address:</strong> <span class="address">${tx.details.touristAddress}</span></div>
+                                <div><strong>Amount Issued:</strong> <span class="amount">${tx.details.amount}</span></div>
+                                <div><strong>Origin Country:</strong> ${tx.details.originCountry}</div>
+                                <div><strong>Expiration Date:</strong> ${tx.details.expirationDate}</div>
+                            </div>
+                        </div>
+                    `;
+                case 'transfer':
+                    return `
+                        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
+                            <h5 style="margin-bottom: 10px; color: #4a5568;">💸 Transfer Details</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                                <div><strong>Amount:</strong> <span class="amount">${tx.details.amount}</span></div>
+                                <div><strong>Tourist Country:</strong> ${tx.details.touristCountry}</div>
+                                <div><strong>Restaurant:</strong> ${tx.details.restaurantName}</div>
+                                <div><strong>Remaining Daily Limit:</strong> ${tx.details.remainingLimit}</div>
+                            </div>
+                        </div>
+                    `;
+                default:
+                    return '';
+            }
+        }
+
+        // Load transactions when page loads
+        window.addEventListener('load', loadTransactions);
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadTransactions, 30000);
+    </script>
+</body>
+</html>

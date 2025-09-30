@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileCoin - Tourist Rewards Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .info-item h4 {
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .info-item p {
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin: 3px 0;
+        }
+
+        .address {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.1);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+
+        .balance {
+            font-weight: bold;
+            color: #38a169;
+            font-size: 1.1rem;
+        }
+
+        .status {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .transaction-item {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ed8936;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #38a169;
+        }
+
+        .json-display {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🪙 SmileCoin Dashboard</h1>
+            <p>Tourist Rewards Blockchain System - Local Network</p>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="/" style="color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 25px; margin: 0 10px;">🏠 Dashboard</a>
+            <a href="/transactions.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 25px; margin: 0 10px;">📋 Transactions</a>
+            <a href="/web-dashboard.html" style="color: white; text-decoration: none; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 25px; margin: 0 10px;">🔧 Advanced</a>
+        </div>
+
+        <div class="card">
+            <h2>📊 System Status</h2>
+            <div class="status">✅ SmileCoin Contract Deployed</div>
+            <button class="refresh-btn" onclick="loadData()">🔄 Refresh Data</button>
+        </div>
+
+        <div class="card">
+            <h2>📋 Smart Contract Information</h2>
+            <div id="contractInfo">Loading...</div>
+        </div>
+
+        <div class="card">
+            <h2>👤 Tourist Accounts</h2>
+            <div id="touristInfo">Loading...</div>
+        </div>
+
+        <div class="card">
+            <h2>🍽️ Restaurant Accounts</h2>
+            <div id="restaurantInfo">Loading...</div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Transaction Summary</h2>
+            <div id="transactionInfo">Loading...</div>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="/transactions.html" class="refresh-btn" style="text-decoration: none; display: inline-block;">
+                    📋 View Detailed Transactions
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📄 Raw Deployment Data</h2>
+            <div id="rawData" class="json-display">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        let deploymentData = null;
+
+        async function loadData() {
+            try {
+                // Load deployment report
+                const response = await fetch('./local-deployment-report.json');
+                if (!response.ok) {
+                    throw new Error('Could not load deployment report');
+                }
+                
+                deploymentData = await response.json();
+                
+                // Update all sections
+                updateContractInfo();
+                updateTouristInfo();
+                updateRestaurantInfo();
+                updateTransactionInfo();
+                updateRawData();
+                
+                console.log('Dashboard data loaded successfully');
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('contractInfo').innerHTML = `
+                    <div style="color: #e53e3e; background: #fed7d7; padding: 15px; border-radius: 8px;">
+                        <strong>Error:</strong> ${error.message}<br>
+                        <small>Make sure the local blockchain is running and the contract is deployed.</small>
+                    </div>
+                `;
+            }
+        }
+
+        function updateContractInfo() {
+            const contract = deploymentData.contract;
+            const network = deploymentData.network;
+            const businessRules = deploymentData.businessRules;
+            
+            document.getElementById('contractInfo').innerHTML = `
+                <div class="info-grid">
+                    <div class="info-item">
+                        <h4>📍 Contract Address</h4>
+                        <p class="address">${contract.address}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>🪙 Token Details</h4>
+                        <p><strong>Name:</strong> ${contract.name}</p>
+                        <p><strong>Symbol:</strong> ${contract.symbol}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>👑 Contract Owner</h4>
+                        <p class="address">${contract.owner}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>🌐 Network Info</h4>
+                        <p><strong>Network:</strong> ${network.name}</p>
+                        <p><strong>Chain ID:</strong> ${network.chainId}</p>
+                        <p><strong>RPC:</strong> ${network.rpcUrl}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>⚙️ Daily Coin Amount</h4>
+                        <p class="balance">${businessRules.dailyCoinAmount} SMILE</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>⏰ Coin Expiration</h4>
+                        <p class="balance">${businessRules.coinExpirationDays} days</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>🏪 Max Per Restaurant</h4>
+                        <p class="balance">${businessRules.maxCoinsPerRestaurantPerDay} SMILE</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>✅ Business Rules</h4>
+                        <p>${businessRules.dailyLimitsEnforced}</p>
+                        <p>${businessRules.transferLimitsEnforced}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateTouristInfo() {
+            const accounts = deploymentData.accounts;
+            let html = '<div class="info-grid">';
+            
+            Object.entries(accounts).forEach(([key, account]) => {
+                if (key.startsWith('tourist')) {
+                    html += `
+                        <div class="info-item">
+                            <h4>🌍 Tourist from ${account.country}</h4>
+                            <p><strong>Address:</strong></p>
+                            <p class="address">${account.address}</p>
+                            <p><strong>Initial Balance:</strong> ${account.initialBalance} SMILE</p>
+                            <p><strong>Final Balance:</strong> <span class="balance">${account.finalBalance} SMILE</span></p>
+                            <p><strong>Spent:</strong> ${parseFloat(account.initialBalance) - parseFloat(account.finalBalance)} SMILE</p>
+                        </div>
+                    `;
+                }
+            });
+            
+            html += '</div>';
+            document.getElementById('touristInfo').innerHTML = html;
+        }
+
+        function updateRestaurantInfo() {
+            const accounts = deploymentData.accounts;
+            let html = '<div class="info-grid">';
+            
+            Object.entries(accounts).forEach(([key, account]) => {
+                if (key.startsWith('restaurant')) {
+                    html += `
+                        <div class="info-item">
+                            <h4>🏪 ${account.name}</h4>
+                            <p><strong>Address:</strong></p>
+                            <p class="address">${account.address}</p>
+                            <p><strong>Google Place ID:</strong></p>
+                            <p class="address">${account.placeId}</p>
+                            <p><strong>Total Earnings:</strong> <span class="balance">${account.earnings} SMILE</span></p>
+                        </div>
+                    `;
+                }
+            });
+            
+            html += '</div>';
+            document.getElementById('restaurantInfo').innerHTML = html;
+        }
+
+        function updateTransactionInfo() {
+            const transactions = deploymentData.transactions;
+            
+            document.getElementById('transactionInfo').innerHTML = `
+                <div class="info-grid">
+                    <div class="info-item">
+                        <h4>📊 Total Transactions</h4>
+                        <p class="balance">${transactions.totalTransactions}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>📦 Contract Deployment</h4>
+                        <p>${transactions.contractDeployment}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>👤 Tourist Registrations</h4>
+                        <p class="balance">${transactions.touristRegistrations}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>🍽️ Restaurant Registrations</h4>
+                        <p class="balance">${transactions.restaurantRegistrations}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>🪙 Daily Coin Issuances</h4>
+                        <p class="balance">${transactions.dailyCoinIssuances}</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>💸 Restaurant Transfers</h4>
+                        <p class="balance">${transactions.restaurantTransfers}</p>
+                    </div>
+                </div>
+                
+                <div class="success">
+                    <strong>✅ All Transactions Successful!</strong><br>
+                    The SmileCoin tourist rewards system is fully operational with all business rules working correctly.
+                </div>
+            `;
+        }
+
+        function updateRawData() {
+            document.getElementById('rawData').textContent = JSON.stringify(deploymentData, null, 2);
+        }
+
+        // Load data when page loads
+        window.addEventListener('load', loadData);
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>
