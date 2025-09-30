@@ -74,9 +74,13 @@ class RedisClient {
     }
   }
 
-  async del(key: string): Promise<boolean> {
+  async del(key: string | string[]): Promise<boolean> {
     try {
-      await this.client.del(key);
+      if (Array.isArray(key)) {
+        await this.client.del(key);
+      } else {
+        await this.client.del(key);
+      }
       return true;
     } catch (error) {
       console.error(`Redis DEL error for key ${key}:`, error);
@@ -90,6 +94,35 @@ class RedisClient {
       return result === 1;
     } catch (error) {
       console.error(`Redis EXISTS error for key ${key}:`, error);
+      return false;
+    }
+  }
+
+  async setEx(key: string, seconds: number, value: string): Promise<boolean> {
+    try {
+      await this.client.setEx(key, seconds, value);
+      return true;
+    } catch (error) {
+      console.error(`Redis SETEX error for key ${key}:`, error);
+      return false;
+    }
+  }
+
+  async keys(pattern: string): Promise<string[]> {
+    try {
+      return await this.client.keys(pattern);
+    } catch (error) {
+      console.error(`Redis KEYS error for pattern ${pattern}:`, error);
+      return [];
+    }
+  }
+
+  async flushAll(): Promise<boolean> {
+    try {
+      await this.client.flushAll();
+      return true;
+    } catch (error) {
+      console.error('Redis FLUSHALL error:', error);
       return false;
     }
   }

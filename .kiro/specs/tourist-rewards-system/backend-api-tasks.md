@@ -70,7 +70,7 @@ This task list covers the backend API endpoints for users and restaurants, exclu
   - Create endpoints for tracking user daily coin distribution
   - _Focus: Transaction business logic without blockchain calls_
 
-- [-] 8. Restaurant Web Dashboard APIs
+- [x] 8. Restaurant Web Dashboard APIs
 
   - Create restaurant daily statistics endpoint with date filtering
   - Implement total statistics endpoint (total coins, ranking, trends)
@@ -79,7 +79,7 @@ This task list covers the backend API endpoints for users and restaurants, exclu
   - Create restaurant comparison and benchmarking endpoints
   - _Focus: Analytics and reporting for restaurant managers_
 
-- [ ] 9. Physical Coin Souvenir Tracking APIs
+- [-] 9. Physical Coin Souvenir Tracking APIs
 
   - Implement daily coin distribution tracking for each user
   - Create progress tracking endpoint showing completion status

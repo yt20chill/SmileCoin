@@ -119,18 +119,21 @@ export class DashboardService {
 
       const uniqueTouristsMap = new Map(
         uniqueTouristsPerDay.map(item => [
-          item.transactionDate.toISOString().split('T')[0],
+          item.transactionDate?.toISOString().split('T')[0] || '',
           item._count.userId
         ])
       );
 
-      const result: DailyStats[] = dailyStats.map(stat => ({
-        date: stat.transactionDate.toISOString().split('T')[0],
-        coinsReceived: stat._sum.amount || 0,
-        uniqueTourists: uniqueTouristsMap.get(stat.transactionDate.toISOString().split('T')[0]) || 0,
-        transactions: stat._count.id,
-        averageCoinsPerTransaction: Number((stat._avg.amount || 0).toFixed(2)),
-      }));
+      const result: DailyStats[] = dailyStats.map(stat => {
+        const dateStr = stat.transactionDate?.toISOString().split('T')[0] || '';
+        return {
+          date: dateStr,
+          coinsReceived: stat._sum.amount || 0,
+          uniqueTourists: uniqueTouristsMap.get(dateStr) || 0,
+          transactions: stat._count.id,
+          averageCoinsPerTransaction: Number((stat._avg.amount || 0).toFixed(2)),
+        };
+      });
 
       // Cache the result
       await redisClient.setEx(cacheKey, this.CACHE_TTL, JSON.stringify(result));
@@ -388,24 +391,26 @@ export class DashboardService {
       }
 
       // Use raw query for date truncation
-      const trends = await prisma.$queryRaw<Array<{
-        period: Date;
-        coins_received: bigint;
-        unique_tourists: bigint;
-        transactions: bigint;
-      }>>`
+      const queryString = `
         SELECT 
-          DATE_TRUNC(${dateTrunc}, transaction_date) as period,
+          DATE_TRUNC('${dateTrunc}', transaction_date) as period,
           SUM(amount) as coins_received,
           COUNT(DISTINCT user_id) as unique_tourists,
           COUNT(*) as transactions
         FROM transactions 
-        WHERE restaurant_id = ${restaurantId}
-          AND transaction_date >= ${defaultStartDate}
-          AND transaction_date <= ${defaultEndDate}
-        GROUP BY DATE_TRUNC(${dateTrunc}, transaction_date)
+        WHERE restaurant_id = $1
+          AND transaction_date >= $2
+          AND transaction_date <= $3
+        GROUP BY DATE_TRUNC('${dateTrunc}', transaction_date)
         ORDER BY period ASC
       `;
+
+      const trends = await prisma.$queryRawUnsafe<Array<{
+        period: Date;
+        coins_received: bigint;
+        unique_tourists: bigint;
+        transactions: bigint;
+      }>>(queryString, restaurantId, defaultStartDate, defaultEndDate);
 
       // Calculate growth rates
       const result: TrendData[] = trends.map((trend, index) => {
@@ -413,14 +418,17 @@ export class DashboardService {
         let growthRate = 0;
 
         if (index > 0) {
-          const previousCoins = Number(trends[index - 1].coins_received);
-          if (previousCoins > 0) {
-            growthRate = Number((((coinsReceived - previousCoins) / previousCoins) * 100).toFixed(2));
+          const previousTrend = trends[index - 1];
+          if (previousTrend) {
+            const previousCoins = Number(previousTrend.coins_received);
+            if (previousCoins > 0) {
+              growthRate = Number((((coinsReceived - previousCoins) / previousCoins) * 100).toFixed(2));
+            }
           }
         }
 
         return {
-          period: trend.period.toISOString().split('T')[0],
+          period: trend.period?.toISOString().split('T')[0] || '',
           coinsReceived,
           uniqueTourists: Number(trend.unique_tourists),
           transactions: Number(trend.transactions),

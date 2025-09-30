@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import authRoutes from './authRoutes';
+import dashboardRoutes from './dashboardRoutes';
 import rankingRoutes from './rankingRoutes';
 import restaurantRoutes from './restaurantRoutes';
 import transactionRoutes from './transactionRoutes';
@@ -15,6 +16,9 @@ router.use('/users', userRoutes);
 
 // Restaurant routes
 router.use('/restaurants', restaurantRoutes);
+
+// Dashboard routes (includes restaurant dashboard endpoints)
+router.use('/', dashboardRoutes);
 
 // Ranking routes
 router.use('/rankings', rankingRoutes);
