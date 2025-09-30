@@ -38,7 +38,7 @@
   - Build restaurant data caching system with Redis
   - _Requirements: 3.1, 4_
 
-- [ ] 6. Backend API Restaurant Endpoints Implementation
+- [x] 6. Backend API Restaurant Endpoints Implementation
   - Implement nearby restaurants endpoint with Google Maps API integration
   - Create restaurant details fetching and caching
   - Build global restaurant rankings endpoint based on smile coins received
@@ -101,7 +101,7 @@
   - Connect to blockchain transaction creation for coin transfers
   - _Requirements: 2, 4_
 
-- [ ] 14. Restaurant Web Dashboard Frontend Implementation
+- [x] 14. Restaurant Web Dashboard Frontend Implementation
   - Implement restaurant statistics overview page showing total coins and ranking
   - Build daily statistics chart showing coins received over time using Chart.js
   - Create tourist origin breakdown visualization with country statistics
