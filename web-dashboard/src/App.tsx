@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import QRCodeDemo from './components/QRCodeDemo';
+import SouvenirProgress from './components/SouvenirProgress';
+import VoucherRedemption from './components/VoucherRedemption';
 
 function Navigation() {
   const location = useLocation();
@@ -29,6 +31,26 @@ function Navigation() {
             }`}
           >
             QR Code Generator
+          </Link>
+          <Link
+            to="/souvenir-progress"
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              location.pathname === '/souvenir-progress'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Souvenir Progress
+          </Link>
+          <Link
+            to="/voucher-redemption"
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              location.pathname === '/voucher-redemption'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Voucher Redemption
           </Link>
         </div>
       </div>
@@ -58,6 +80,8 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/restaurant/:placeId" element={<Dashboard />} />
             <Route path="/qr-generator" element={<QRCodeDemo />} />
+            <Route path="/souvenir-progress" element={<SouvenirProgress />} />
+            <Route path="/voucher-redemption" element={<VoucherRedemption />} />
           </Routes>
         </main>
       </div>
