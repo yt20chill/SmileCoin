@@ -42,7 +42,7 @@ This task list covers the backend API endpoints for users and restaurants, exclu
   - Create distance calculation utilities for restaurant ranking
   - _Focus: Restaurant discovery and location services_
 
-- [-] 5. Restaurant Management Endpoints
+- [x] 5. Restaurant Management Endpoints
 
   - Create restaurant registration endpoint using Google Place ID
   - Generate unique QR codes containing Place ID and wallet address

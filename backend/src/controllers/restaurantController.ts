@@ -72,6 +72,15 @@ export class RestaurantController {
     try {
       const { id } = req.params;
 
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: 'Bad Request',
+          message: 'Restaurant ID is required'
+        });
+        return;
+      }
+
       logger.info(`Restaurant profile request: ${id}`);
 
       const restaurant = await restaurantService.getRestaurantProfile(id);
@@ -121,6 +130,15 @@ export class RestaurantController {
   async getRestaurantByPlaceId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { placeId } = req.params;
+
+      if (!placeId) {
+        res.status(400).json({
+          success: false,
+          error: 'Bad Request',
+          message: 'Google Place ID is required'
+        });
+        return;
+      }
 
       logger.info(`Restaurant by place ID request: ${placeId}`);
 

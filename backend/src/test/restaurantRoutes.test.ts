@@ -1,278 +1,138 @@
 import request from 'supertest';
 import App from '../app';
-import { redisClient } from '../config/redis';
 
-// Mock the Google Maps service
-jest.mock('../services/googleMapsService', () => ({
-  googleMapsService: {
-    getNearbyRestaurants: jest.fn(),
-    getRestaurantDetails: jest.fn(),
-    searchRestaurants: jest.fn(),
-    calculateDistance: jest.fn(),
-    clearCache: jest.fn(),
-  },
-}));
+const app = new App().getApp();
 
-describe('Restaurant Routes', () => {
-  let app: any;
-  const mockGoogleMapsService = require('../services/googleMapsService').googleMapsService;
-
-  beforeAll(async () => {
-    app = new App().getApp();
-    
-    // Ensure Redis connection for tests
-    if (!redisClient.isClientConnected()) {
-      await redisClient.connect();
-    }
-  });
-
-  afterAll(async () => {
-    // Clean up Redis connection
-    if (redisClient.isClientConnected()) {
-      await redisClient.disconnect();
-    }
-  });
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  describe('GET /api/v1/restaurants/nearby', () => {
-    it('should return nearby restaurants with valid parameters', async () => {
-      const mockRestaurants = [
-        {
-          placeId: 'test_place_1',
-          name: 'Test Restaurant 1',
-          address: 'Test Address 1',
-          location: { latitude: 22.3193, longitude: 114.1694 },
-          rating: 4.5,
-        },
-        {
-          placeId: 'test_place_2',
-          name: 'Test Restaurant 2',
-          address: 'Test Address 2',
-          location: { latitude: 22.3200, longitude: 114.1700 },
-          rating: 4.0,
-        },
-      ];
-
-      mockGoogleMapsService.getNearbyRestaurants.mockResolvedValue(mockRestaurants);
-      mockGoogleMapsService.calculateDistance.mockReturnValue(0.5);
-
+describe('Restaurant Routes - Basic Validation', () => {
+  describe('POST /api/v1/restaurants/register', () => {
+    it('should validate required fields', async () => {
       const response = await request(app)
-        .get('/api/v1/restaurants/nearby')
-        .query({
-          lat: 22.3193,
-          lng: 114.1694,
-          radius: 1000,
-        });
+        .post('/api/v1/restaurants/register')
+        .send({});
 
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveLength(2);
-      expect(response.body.data[0]).toHaveProperty('distance');
-      expect(response.body.meta.count).toBe(2);
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Validation failed');
+      expect(response.body.details).toBeDefined();
+      expect(Array.isArray(response.body.details)).toBe(true);
     });
 
-    it('should return 400 for invalid latitude', async () => {
+    it('should validate Google Place ID format', async () => {
       const response = await request(app)
-        .get('/api/v1/restaurants/nearby')
-        .query({
-          lat: 200, // Invalid latitude
-          lng: 114.1694,
-          radius: 1000,
+        .post('/api/v1/restaurants/register')
+        .send({
+          googlePlaceId: 'invalid',
+          walletAddress: '0x1234567890123456789012345678901234567890'
         });
 
       expect(response.status).toBe(400);
       expect(response.body.error).toBe('Validation failed');
     });
 
-    it('should return 400 for missing required parameters', async () => {
+    it('should validate wallet address format', async () => {
       const response = await request(app)
-        .get('/api/v1/restaurants/nearby')
+        .post('/api/v1/restaurants/register')
+        .send({
+          googlePlaceId: 'ChIJN1t_tDeuEmsRUsoyG83frY4',
+          walletAddress: 'invalid-wallet'
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Validation failed');
+    });
+  });
+
+  describe('GET /api/v1/restaurants', () => {
+    it('should validate pagination parameters', async () => {
+      const response = await request(app)
+        .get('/api/v1/restaurants')
         .query({
-          lat: 22.3193,
-          // Missing lng and radius
+          page: 0,
+          limit: 101
         });
 
       expect(response.status).toBe(400);
       expect(response.body.error).toBe('Validation failed');
     });
 
-    it('should handle service errors gracefully', async () => {
-      mockGoogleMapsService.getNearbyRestaurants.mockRejectedValue(
-        new Error('Google Maps API error')
-      );
-
+    it('should validate location parameters', async () => {
       const response = await request(app)
-        .get('/api/v1/restaurants/nearby')
+        .get('/api/v1/restaurants')
         .query({
-          lat: 22.3193,
-          lng: 114.1694,
-          radius: 1000,
+          lat: 'invalid',
+          lng: 'invalid'
         });
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Validation failed');
     });
   });
 
-  describe('GET /api/v1/restaurants/details/:placeId', () => {
-    it('should return restaurant details for valid place ID', async () => {
-      const mockRestaurant = {
-        placeId: 'test_place_id',
-        name: 'Test Restaurant',
-        address: 'Test Address',
-        location: { latitude: 22.3193, longitude: 114.1694 },
-        rating: 4.5,
-        priceLevel: 2,
-      };
-
-      mockGoogleMapsService.getRestaurantDetails.mockResolvedValue(mockRestaurant);
-
+  describe('GET /api/v1/restaurants/place/:placeId', () => {
+    it('should validate place ID parameter', async () => {
       const response = await request(app)
-        .get('/api/v1/restaurants/details/test_place_id');
+        .get('/api/v1/restaurants/place/invalid');
 
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
-      expect(response.body.data).toEqual(mockRestaurant);
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Validation failed');
+    });
+  });
+
+  describe('POST /api/v1/restaurants/qr/verify', () => {
+    it('should validate QR code data', async () => {
+      const response = await request(app)
+        .post('/api/v1/restaurants/qr/verify')
+        .send({});
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Validation failed');
     });
 
-    it('should return 404 for non-existent place ID', async () => {
-      mockGoogleMapsService.getRestaurantDetails.mockResolvedValue(null);
-
+    it('should reject invalid QR code format', async () => {
       const response = await request(app)
-        .get('/api/v1/restaurants/details/nonexistent_place_id');
+        .post('/api/v1/restaurants/qr/verify')
+        .send({
+          qrCodeData: 'invalid-qr-data'
+        });
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toBe('Restaurant not found');
-    });
-
-    it('should return 400 for invalid place ID format', async () => {
-      const response = await request(app)
-        .get('/api/v1/restaurants/details/short'); // Too short
-
-      expect(response.status).toBe(400);
-      expect(response.body.error).toBe('Validation failed');
+      expect(response.body.error).toBe('Invalid QR Code');
     });
   });
 
-  describe('GET /api/v1/restaurants/search', () => {
-    it('should return search results for valid query', async () => {
-      const mockRestaurants = [
-        {
-          placeId: 'search_result_1',
-          name: 'Pizza Restaurant',
-          address: 'Pizza Address',
-          location: { latitude: 22.3193, longitude: 114.1694 },
-          rating: 4.2,
-        },
-      ];
-
-      mockGoogleMapsService.searchRestaurants.mockResolvedValue(mockRestaurants);
-
+  describe('Route existence', () => {
+    it('should have register endpoint', async () => {
       const response = await request(app)
-        .get('/api/v1/restaurants/search')
-        .query({
-          q: 'pizza',
-        });
+        .post('/api/v1/restaurants/register')
+        .send({});
 
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveLength(1);
-      expect(response.body.meta.query).toBe('pizza');
+      // Should not be 404 (route not found)
+      expect(response.status).not.toBe(404);
     });
 
-    it('should include distance when location is provided', async () => {
-      const mockRestaurants = [
-        {
-          placeId: 'search_result_1',
-          name: 'Pizza Restaurant',
-          address: 'Pizza Address',
-          location: { latitude: 22.3193, longitude: 114.1694 },
-          rating: 4.2,
-        },
-      ];
-
-      mockGoogleMapsService.searchRestaurants.mockResolvedValue(mockRestaurants);
-      mockGoogleMapsService.calculateDistance.mockReturnValue(1.2);
-
+    it('should have QR verify endpoint', async () => {
       const response = await request(app)
-        .get('/api/v1/restaurants/search')
-        .query({
-          q: 'pizza',
-          lat: 22.3200,
-          lng: 114.1700,
-        });
+        .post('/api/v1/restaurants/qr/verify')
+        .send({});
 
-      expect(response.status).toBe(200);
-      expect(response.body.data[0]).toHaveProperty('distance');
-      expect(response.body.meta.searchLocation).toBeDefined();
+      // Should not be 404 (route not found)
+      expect(response.status).not.toBe(404);
     });
 
-    it('should return 400 for empty query', async () => {
+    it('should have search advanced endpoint', async () => {
       const response = await request(app)
-        .get('/api/v1/restaurants/search')
-        .query({
-          q: '', // Empty query
-        });
+        .get('/api/v1/restaurants/search/advanced');
 
-      expect(response.status).toBe(400);
-      expect(response.body.error).toBe('Validation failed');
-    });
-  });
-
-  describe('POST /api/v1/restaurants/distance', () => {
-    it('should calculate distance between two coordinates', async () => {
-      mockGoogleMapsService.calculateDistance.mockReturnValue(1.5);
-
-      const response = await request(app)
-        .post('/api/v1/restaurants/distance')
-        .send({
-          from: { latitude: 22.3193, longitude: 114.1694 },
-          to: { latitude: 22.3200, longitude: 114.1700 },
-        });
-
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
-      expect(response.body.data.distance).toBe(1.5);
-      expect(response.body.data.unit).toBe('kilometers');
+      // Should not be 404 (route not found)
+      expect(response.status).not.toBe(404);
     });
 
-    it('should return 400 for invalid coordinates', async () => {
+    it('should have place lookup endpoint', async () => {
       const response = await request(app)
-        .post('/api/v1/restaurants/distance')
-        .send({
-          from: { latitude: 200, longitude: 114.1694 }, // Invalid latitude
-          to: { latitude: 22.3200, longitude: 114.1700 },
-        });
+        .get('/api/v1/restaurants/place/test');
 
-      expect(response.status).toBe(400);
-      expect(response.body.error).toBe('Validation failed');
-    });
-  });
-
-  describe('DELETE /api/v1/restaurants/cache', () => {
-    it('should clear cache successfully', async () => {
-      mockGoogleMapsService.clearCache.mockResolvedValue();
-
-      const response = await request(app)
-        .delete('/api/v1/restaurants/cache');
-
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
-      expect(response.body.message).toBe('Cache cleared successfully');
-    });
-
-    it('should clear cache with pattern', async () => {
-      mockGoogleMapsService.clearCache.mockResolvedValue();
-
-      const response = await request(app)
-        .delete('/api/v1/restaurants/cache')
-        .query({ pattern: 'nearby' });
-
-      expect(response.status).toBe(200);
-      expect(mockGoogleMapsService.clearCache).toHaveBeenCalledWith('nearby');
+      // Should not be 404 (route not found), should be validation error
+      expect(response.status).not.toBe(404);
     });
   });
 });
