@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Coin background -->
+  <circle cx="256" cy="256" r="240" fill="#fbbf24" stroke="#f59e0b" stroke-width="8"/>
+  
+  <!-- Inner circle -->
+  <circle cx="256" cy="256" r="200" fill="#fcd34d" stroke="#f59e0b" stroke-width="4"/>
+  
+  <!-- Smile face -->
+  <!-- Eyes -->
+  <circle cx="200" cy="200" r="20" fill="#dc2626"/>
+  <circle cx="312" cy="200" r="20" fill="#dc2626"/>
+  
+  <!-- Smile -->
+  <path d="M 180 300 Q 256 360 332 300" stroke="#dc2626" stroke-width="12" fill="none" stroke-linecap="round"/>
+  
+  <!-- HK text -->
+  <text x="256" y="380" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="#dc2626">HK</text>
+</svg>
