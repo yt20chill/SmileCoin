@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import QRCodeGenerator from './QRCodeGenerator';
 
 const QRCodeDemo: React.FC = () => {
+  const { t } = useTranslation();
   const [selectedDemo, setSelectedDemo] = useState<string>('demo-restaurant-123');
 
   const demoRestaurants = [
     { 
       id: 'demo-restaurant-123', 
-      name: 'Golden Dragon Restaurant',
+      name: t('restaurants.goldenDragon'),
       placeId: 'ChIJN1t_tDeuEmsRUsoyG83frY4',
-      address: '123 Central District, Hong Kong'
+      address: t('locations.central')
     },
     { 
       id: 'demo-restaurant-456', 
-      name: 'Harbour View Cafe',
+      name: t('restaurants.harbourView'),
       placeId: 'ChIJrTLr-GyuEmsRBfy61i59si0',
-      address: '456 Tsim Sha Tsui, Hong Kong'
+      address: t('locations.tsimShaTsui')
     },
     { 
       id: 'demo-restaurant-789', 
-      name: 'Peak Dining',
+      name: t('restaurants.peakDining'),
       placeId: 'ChIJ2eUgeAK6EmsRqRfr6hFrw-M',
-      address: '789 The Peak, Hong Kong'
+      address: t('locations.thePeak')
     }
   ];
 
@@ -29,21 +31,21 @@ const QRCodeDemo: React.FC = () => {
     <div className="space-y-8">
       {/* Header */}
       <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">QR Code Generator for Restaurants</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('qrGenerator.demo.title')}</h2>
         <p className="text-gray-600 mb-4">
-          Generate QR codes for restaurants to enable tourists to give smile coins. Each QR code contains:
+          {t('qrGenerator.demo.description')}
         </p>
         <ul className="list-disc list-inside text-gray-600 space-y-1">
-          <li>Restaurant's Google Place ID</li>
-          <li>Restaurant name and address</li>
-          <li>Unique blockchain wallet address</li>
-          <li>Security signature for validation</li>
+          <li>{t('qrGenerator.demo.feature1')}</li>
+          <li>{t('qrGenerator.demo.feature2')}</li>
+          <li>{t('qrGenerator.demo.feature3')}</li>
+          <li>{t('qrGenerator.demo.feature4')}</li>
         </ul>
       </div>
 
       {/* Demo Restaurant Selector */}
       <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Try with Demo Restaurants</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('qrGenerator.demo.tryDemo')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {demoRestaurants.map((restaurant) => (
             <button

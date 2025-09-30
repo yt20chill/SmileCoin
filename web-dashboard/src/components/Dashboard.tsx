@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import StatsOverview from './StatsOverview';
 import DailyStatsChart from './DailyStatsChart';
 import OriginBreakdown from './OriginBreakdown';
@@ -10,6 +11,7 @@ import { DailyStats, TotalStats, OriginStats, TrendData } from '../types/dashboa
 
 const Dashboard: React.FC = () => {
   const { placeId } = useParams<{ placeId: string }>();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -46,7 +48,7 @@ const Dashboard: React.FC = () => {
       setTrendData(trendStatsData);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError('Failed to load dashboard data. Please try again.');
+      setError(t('dashboard.failedToLoad'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -75,7 +77,7 @@ const Dashboard: React.FC = () => {
             onClick={handleRefresh}
             className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
           >
-            Try Again
+            {t('common.tryAgain')}
           </button>
         </div>
       </div>
@@ -87,9 +89,9 @@ const Dashboard: React.FC = () => {
       {/* Header with refresh button */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Restaurant Dashboard</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t('dashboard.restaurantDashboard')}</h2>
           <p className="text-gray-600 mt-1">
-            {placeId ? `Restaurant ID: ${placeId}` : 'Demo Restaurant Analytics'}
+            {placeId ? `Restaurant ID: ${placeId}` : t('dashboard.demoAnalytics')}
           </p>
         </div>
         <button
@@ -105,7 +107,7 @@ const Dashboard: React.FC = () => {
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          <span>{refreshing ? 'Refreshing...' : 'Refresh Data'}</span>
+          <span>{refreshing ? t('common.refreshing') : t('dashboard.refreshData')}</span>
         </button>
       </div>
 
@@ -133,10 +135,9 @@ const Dashboard: React.FC = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
           <div>
-            <h4 className="font-medium text-blue-900">Blockchain Verified Data</h4>
+            <h4 className="font-medium text-blue-900">{t('dashboard.blockchain.title')}</h4>
             <p className="text-blue-700 text-sm mt-1">
-              All smile coin transactions are recorded on the blockchain for complete transparency. 
-              Click on any transaction to view it on the blockchain explorer.
+              {t('dashboard.blockchain.description')}
             </p>
           </div>
         </div>

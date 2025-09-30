@@ -1,12 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Dashboard from './components/Dashboard';
 import QRCodeDemo from './components/QRCodeDemo';
 import SouvenirProgress from './components/SouvenirProgress';
 import VoucherRedemption from './components/VoucherRedemption';
+import LanguageSelector from './components/LanguageSelector';
 
 function Navigation() {
   const location = useLocation();
+  const { t } = useTranslation();
   
   return (
     <nav className="bg-white border-b border-gray-200">
@@ -20,7 +23,7 @@ function Navigation() {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Dashboard
+            {t('navigation.dashboard')}
           </Link>
           <Link
             to="/qr-generator"
@@ -30,7 +33,7 @@ function Navigation() {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            QR Code Generator
+            {t('navigation.qrGenerator')}
           </Link>
           <Link
             to="/souvenir-progress"
@@ -40,7 +43,7 @@ function Navigation() {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Souvenir Progress
+            {t('navigation.souvenirProgress')}
           </Link>
           <Link
             to="/voucher-redemption"
@@ -50,7 +53,7 @@ function Navigation() {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Voucher Redemption
+            {t('navigation.voucherRedemption')}
           </Link>
         </div>
       </div>
@@ -59,16 +62,21 @@ function Navigation() {
 }
 
 function App() {
+  const { t } = useTranslation();
+  
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
         <header className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
-              <h1 className="text-3xl font-bold text-gray-900">
-                Restaurant Management System
-              </h1>
-              <p className="text-sm text-gray-500">Tourist Rewards System</p>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {t('dashboard.title')}
+                </h1>
+                <p className="text-sm text-gray-500">{t('dashboard.subtitle')}</p>
+              </div>
+              <LanguageSelector />
             </div>
           </div>
         </header>
