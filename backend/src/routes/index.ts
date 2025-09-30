@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import authRoutes from './authRoutes';
+import rankingRoutes from './rankingRoutes';
 import restaurantRoutes from './restaurantRoutes';
+import transactionRoutes from './transactionRoutes';
 import userRoutes from './userRoutes';
 
 const router = Router();
@@ -14,9 +16,10 @@ router.use('/users', userRoutes);
 // Restaurant routes
 router.use('/restaurants', restaurantRoutes);
 
-// Other route modules will be imported and used here
-// Example:
-// import transactionRoutes from './transactions';
-// router.use('/transactions', transactionRoutes);
+// Ranking routes
+router.use('/rankings', rankingRoutes);
+
+// Transaction routes
+router.use('/transactions', transactionRoutes);
 
 export default router;

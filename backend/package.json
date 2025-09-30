@@ -10,7 +10,7 @@
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
     "studio": "prisma studio",
-    "seed": "ts-node src/scripts/seed.ts",
+    "seed": "ts-node prisma/seed.ts",
     "create-views": "ts-node src/scripts/createViews.ts",
     "test": "jest",
     "test:watch": "jest --watch"

@@ -106,6 +106,8 @@ class App {
         endpoints: {
           auth: '/api/v1/auth',
           users: '/api/v1/users',
+          restaurants: '/api/v1/restaurants',
+          rankings: '/api/v1/rankings',
           health: '/health',
         },
       });

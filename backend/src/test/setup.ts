@@ -7,8 +7,9 @@ process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/tourist_reward
 
 // Mock console methods in tests to reduce noise
 if (process.env.NODE_ENV === 'test') {
-  console.log = jest.fn();
-  console.info = jest.fn();
-  console.warn = jest.fn();
-  console.error = jest.fn();
+  // Temporarily disable console mocking to see debug output
+  // console.log = jest.fn();
+  // console.info = jest.fn();
+  // console.warn = jest.fn();
+  // console.error = jest.fn();
 }

@@ -57,6 +57,41 @@ export interface CreateTransactionRequest {
   gasUsed?: string;
 }
 
+export interface RecordTransactionRequest {
+  restaurantId: string;
+  amount: number;
+}
+
+export interface TransactionValidation {
+  canTransact: boolean;
+  reason?: string;
+  dailyCoinsGiven: number;
+  dailyCoinsRemaining: number;
+  coinsGivenToRestaurantToday: number;
+  maxCoinsPerRestaurantPerDay: number;
+}
+
+export interface DailyDistribution {
+  date: string;
+  coinsReceived: number;
+  coinsGiven: number;
+  coinsRemaining: number;
+  allCoinsGiven: boolean;
+  restaurantsVisited: number;
+}
+
+export interface DailyHistory {
+  totalDays: number;
+  completedDays: number;
+  currentStreak: number;
+  dailyRecords: Array<{
+    date: string;
+    coinsGiven: number;
+    allCoinsGiven: boolean;
+    restaurantsVisited: number;
+  }>;
+}
+
 // JWT payload
 export interface JwtPayload {
   userId: string;

@@ -51,7 +51,7 @@ This task list covers the backend API endpoints for users and restaurants, exclu
   - Add restaurant search functionality by name, location, cuisine type
   - _Focus: Restaurant data management_
 
-- [ ] 6. Restaurant Ranking and Statistics APIs
+- [x] 6. Restaurant Ranking and Statistics APIs
 
   - Create overall restaurant rankings endpoint based on total smile coins
   - Implement origin-based restaurant recommendations using user country data
@@ -61,7 +61,7 @@ This task list covers the backend API endpoints for users and restaurants, exclu
   - Implement caching strategy for ranking data with Redis
   - _Focus: Restaurant discovery and ranking logic_
 
-- [ ] 7. Transaction Recording Endpoints (Non-Blockchain)
+- [x] 7. Transaction Recording Endpoints (Non-Blockchain)
 
   - Create transaction recording endpoint for smile coin transfers
   - Implement daily coin limit validation (max 3 coins per restaurant per day)
@@ -70,7 +70,7 @@ This task list covers the backend API endpoints for users and restaurants, exclu
   - Create endpoints for tracking user daily coin distribution
   - _Focus: Transaction business logic without blockchain calls_
 
-- [ ] 8. Restaurant Web Dashboard APIs
+- [-] 8. Restaurant Web Dashboard APIs
 
   - Create restaurant daily statistics endpoint with date filtering
   - Implement total statistics endpoint (total coins, ranking, trends)
