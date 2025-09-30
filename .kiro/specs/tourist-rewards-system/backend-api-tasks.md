@@ -108,7 +108,7 @@ This task list covers the backend API endpoints for users and restaurants, exclu
   - Create health check endpoints for system monitoring
   - _Focus: Robustness and reliability_
 
-- [-] 12. API Documentation and Testing
+- [x] 12. API Documentation and Testing
   - Create API documentation using Swagger/OpenAPI
   - Write unit tests for all endpoint logic
   - Create integration tests for database operations

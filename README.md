@@ -118,7 +118,7 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - Docker and Docker Compose
 - React Native development environment
 - Google Maps API key
@@ -131,9 +131,13 @@ Unlike traditional review systems, every smile coin transaction is recorded on t
 git clone <repository-url>
 cd tourist-rewards-system
 
-# Start databases
+# Start all services with Docker (Recommended)
 docker-compose up -d
 
+# Access API documentation
+open http://localhost:3001/api-docs
+
+# Or manual setup:
 # Install backend dependencies
 cd backend
 npm install
@@ -150,6 +154,16 @@ cd ../web-dashboard
 npm install
 npm run dev
 ```
+
+### 📚 API Documentation
+
+Complete interactive API documentation is available via Swagger UI:
+
+- **Local Development**: http://localhost:3001/api-docs
+- **Features**: Interactive testing, authentication, complete schema definitions
+- **Postman Collection**: Import from `backend/postman/Tourist-Rewards-API.postman_collection.json`
+
+For detailed Docker setup instructions, see [DOCKER_SETUP.md](DOCKER_SETUP.md).
 
 ## 📊 Project Structure
 

@@ -4,7 +4,7 @@ import express, { Application, NextFunction, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import * as swaggerUi from 'swagger-ui-express';
+import swaggerUi from 'swagger-ui-express';
 
 import { corsOptions } from './config/cors';
 import { prisma } from './config/database';
