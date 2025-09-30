@@ -1,204 +1,149 @@
-# Tourist Rewards System 🪙
+# Tourist Rewards Blockchain Infrastructure
 
-A blockchain-powered mobile application that enables tourists to show appreciation to Hong Kong restaurants through "smile coins" - creating a transparent, gamified experience that supports local businesses and rewards positive customer interactions.
+A blockchain infrastructure system specifically designed to support the Tourist Rewards System. This system provides a cost-effective, developer-friendly API/SDK for backend developers to handle smile coin transactions, tourist wallet management, and restaurant reward tracking on a cheap blockchain network.
 
-## 🌟 The Concept
+## Features
 
-Imagine visiting Hong Kong and having a digital way to instantly reward restaurants that provide exceptional service. The Tourist Rewards System makes this possible through blockchain-verified "smile coins" that tourists can give to restaurants, creating a transparent reputation system that benefits everyone:
+- **SmileCoin Smart Contract**: ERC-20 token with tourist rewards specific features
+- **Wallet Management**: Automatic wallet creation and management for tourists and restaurants
+- **REST API**: Simple endpoints for tourist and restaurant operations
+- **JavaScript SDK**: Easy-to-use SDK for backend integration
+- **Transaction Monitoring**: Real-time blockchain transaction tracking
+- **Cost-Effective**: Optimized for low-cost networks like Polygon
 
-- **Tourists** earn daily smile coins and can reward great service
-- **Restaurants** build verifiable reputation through blockchain records
-- **Tourism Board** promotes positive experiences and supports local businesses
-
-## 🚀 Key Innovation: Blockchain Transparency
-
-Unlike traditional review systems, every smile coin transaction is recorded on the blockchain, providing:
-
-- **Immutable Records**: All transactions are permanently recorded and verifiable
-- **Complete Transparency**: Anyone can verify restaurant ratings through blockchain explorer
-- **Fraud Prevention**: Smart contracts prevent gaming the system
-- **Credible Data**: Tourism boards and restaurants have trustworthy performance metrics
-
-## 📱 How It Works
-
-### For Tourists
-
-1. **Register** with your travel details (origin country, arrival/departure dates)
-2. **Receive** 10 smile coins daily during your Hong Kong visit
-3. **Discover** nearby restaurants through GPS and Google Maps integration
-4. **Visit** restaurants and scan their QR codes to give 1-3 smile coins
-5. **Earn** a physical smile coin souvenir by giving all coins daily
-
-### For Restaurants
-
-1. **Register** your restaurant using Google Maps Place ID
-2. **Display** your unique QR code for tourists to scan
-3. **Receive** smile coins from satisfied customers
-4. **Track** performance through blockchain-verified analytics dashboard
-5. **Build** reputation through transparent, immutable customer feedback
-
-## 🏗️ Technical Architecture
-
-### Mobile App (React Native + NativeWind)
-
-- **Dashboard**: Overall restaurant rankings and statistics
-- **Nearby**: GPS-based restaurant discovery with Google Maps
-- **Recommendations**: Restaurants popular with your countrymen
-- **QR Scanner**: In-restaurant coin giving (QR codes only inside restaurants)
-- **Profile**: Coin balance, transaction history, souvenir progress
-
-### Restaurant Web Dashboard (React + Tailwind CSS)
-
-- **Analytics**: Daily coin statistics and performance trends
-- **Origins**: Tourist country breakdown and demographics
-- **Rankings**: Position among all Hong Kong restaurants
-- **Blockchain**: Direct links to verify all transactions
-
-### Backend (Node.js + Express)
-
-- **Authentication**: JWT-based user management
-- **Google Maps**: Restaurant discovery and location services
-- **Blockchain**: Smart contract integration for coin transactions
-- **Analytics**: Real-time ranking and statistics calculation
-
-### Blockchain (Ethereum/Testnet)
-
-- **Smart Contracts**: Automated coin distribution and expiration
-- **Transparency**: All transactions publicly verifiable
-- **Security**: Immutable records prevent manipulation
-- **Innovation**: Demonstrates real-world blockchain utility
-
-## 🎯 Demo Features
-
-### Core Functionality
-
-- ✅ User registration with travel details
-- ✅ Daily blockchain-verified coin distribution
-- ✅ GPS restaurant discovery with Google Maps
-- ✅ QR code scanning for coin transfers
-- ✅ Real-time blockchain transaction creation
-- ✅ Restaurant rankings and analytics
-
-### Blockchain Innovation Showcase
-
-- ✅ Live blockchain transaction creation during demo
-- ✅ Smart contract automation (coin expiration, validation)
-- ✅ Blockchain explorer links for transaction verification
-- ✅ Immutable reputation system demonstration
-
-## 🛠️ Technology Stack
-
-**Frontend**
-
-- React Native with NativeWind (Tailwind CSS)
-- React.js with Tailwind CSS for web dashboard
-- React Navigation, React Native Maps, QR Scanner
-
-**Backend**
-
-- Node.js with Express.js
-- PostgreSQL with Redis caching
-- Google Maps Places API
-- JWT authentication
-
-**Blockchain**
-
-- Ethereum testnet (Goerli/Sepolia)
-- Solidity smart contracts
-- Web3.js for blockchain interaction
-- MetaMask or custom wallet integration
-
-**Development**
-
-- Docker Compose for local databases
-- Localhost development environment
-- Hot reloading for rapid development
-
-## 🏃‍♂️ Quick Start
+## Quick Start
 
 ### Prerequisites
 
 - Node.js 18+
 - Docker and Docker Compose
-- React Native development environment
-- Google Maps API key
-- Ethereum testnet access
+- Git
 
-### Setup
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd tourist-rewards-blockchain-infrastructure
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Copy environment configuration:
+```bash
+cp .env.example .env.development
+```
+
+4. Start local development environment:
+```bash
+docker-compose up -d
+```
+
+5. Compile and deploy smart contracts:
+```bash
+npm run compile
+npm run deploy:local
+```
+
+6. Start the API server:
+```bash
+npm run dev
+```
+
+The API will be available at `http://localhost:3000`
+
+## Project Structure
+
+```
+├── contracts/              # Smart contracts
+├── src/
+│   ├── api/                # REST API implementation
+│   ├── services/           # Core services (Wallet, Contract management)
+│   └── sdk/                # JavaScript SDK
+├── scripts/                # Deployment and utility scripts
+├── test/                   # Test files
+├── database/               # Database schemas and migrations
+└── docker-compose.yml      # Local development environment
+```
+
+## Development
+
+### Running Tests
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd tourist-rewards-system
+# Run all tests
+npm test
 
-# Start databases
+# Run smart contract tests
+npm run test:contracts
+
+# Run API tests
+npm run test:api
+```
+
+### Building
+
+```bash
+npm run build
+```
+
+### Linting
+
+```bash
+npm run lint
+npm run lint:fix
+```
+
+## Deployment
+
+### Local Development
+```bash
 docker-compose up -d
-
-# Install backend dependencies
-cd backend
-npm install
-npm run migrate
-npm run dev
-
-# Install mobile app dependencies
-cd ../mobile
-npm install
-npx react-native run-ios  # or run-android
-
-# Install web dashboard dependencies
-cd ../web-dashboard
-npm install
-npm run dev
+npm run deploy:local
 ```
 
-## 📊 Project Structure
-
-```
-tourist-rewards-system/
-├── mobile/                 # React Native mobile app
-├── web-dashboard/          # React.js restaurant dashboard
-├── backend/               # Node.js API server
-├── blockchain/            # Smart contracts and deployment
-├── docs/                  # Additional documentation
-├── .kiro/specs/          # Kiro specification files
-└── docker-compose.yml    # Local database setup
+### Polygon Mumbai Testnet
+```bash
+npm run deploy:mumbai
 ```
 
-## 🎪 Demo Highlights
+## API Documentation
 
-1. **User Registration**: Show blockchain wallet creation and travel data capture
-2. **Daily Coins**: Demonstrate automatic coin distribution with blockchain verification
-3. **Restaurant Discovery**: GPS-based search with Google Maps integration
-4. **QR Code Scanning**: Live coin transfer with blockchain transaction creation
-5. **Real-time Rankings**: Restaurant performance updates based on blockchain data
-6. **Analytics Dashboard**: Restaurant manager view with origin breakdowns
-7. **Blockchain Verification**: Direct links to blockchain explorer for transparency
+Once the server is running, visit `http://localhost:3000/docs` for interactive API documentation.
 
-## 🌍 Impact & Vision
+## SDK Usage
 
-### For Hong Kong Tourism
+```javascript
+import { SmileCoinSDK } from './src/sdk/SmileCoinSDK';
 
-- **Quality Assurance**: Transparent restaurant quality metrics
-- **Tourist Satisfaction**: Gamified way to reward good service
-- **Data Insights**: Real tourism patterns and preferences
-- **Local Business Support**: Drive traffic to quality establishments
+const sdk = new SmileCoinSDK({
+  apiUrl: 'http://localhost:3000',
+  apiKey: 'your-api-key'
+});
 
-### Blockchain Innovation
+// Register a tourist
+const tourist = await sdk.registerTourist({
+  touristId: 'tourist-123',
+  originCountry: 'USA',
+  arrivalDate: '2024-01-15',
+  departureDate: '2024-01-22'
+});
 
-- **Real-world Utility**: Practical blockchain application beyond speculation
-- **Transparency**: Public, verifiable reputation system
-- **Automation**: Smart contracts handle complex business logic
-- **Trust**: Immutable records build confidence in the system
+// Issue daily coins
+const coins = await sdk.issueDailyCoins('tourist-123');
+```
 
-## 🏆 Hackathon Achievement
+## Contributing
 
-Built in 36 hours by a 4-person team with Kiro AI assistance, this project demonstrates:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
-- **Rapid Blockchain Development**: From concept to working dApp
-- **Full-stack Integration**: Mobile, web, backend, and blockchain
-- **Real-world Application**: Solving actual tourism industry challenges
-- **Technical Excellence**: Production-ready architecture and code quality
+## License
 
----
-
-**Ready to revolutionize how tourists and restaurants connect in Hong Kong? Let's build the future of transparent, blockchain-powered hospitality! 🚀**
+MIT License - see LICENSE file for details

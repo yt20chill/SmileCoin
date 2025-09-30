@@ -1,0 +1,145 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database for transaction indexing and wallet storage
+  postgres:
+    image: postgres:15-alpine
+    container_name: tourist-rewards-postgres-dev
+    environment:
+      POSTGRES_DB: tourist_rewards_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tourist-rewards-network
+
+  # Redis for caching and job queues
+  redis:
+    image: redis:7-alpine
+    container_name: tourist-rewards-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tourist-rewards-network
+
+  # Local Hardhat blockchain network for development
+  hardhat-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.hardhat
+    container_name: tourist-rewards-hardhat-dev
+    ports:
+      - "8545:8545"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./contracts:/app/contracts
+      - ./scripts:/app/scripts
+      - ./artifacts:/app/artifacts
+      - ./cache:/app/cache
+    command: npx hardhat node --hostname 0.0.0.0 --port 8545
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8545 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - tourist-rewards-network
+
+  # API service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+      target: development
+    container_name: tourist-rewards-api-dev
+    ports:
+      - "3000:3000"
+      - "9229:9229"  # Debug port
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tourist_rewards_dev
+      - REDIS_URL=redis://redis:6379
+      - RPC_URL=http://hardhat-node:8545
+      - CONTRACT_ADDRESS=${CONTRACT_ADDRESS:-}
+      - ADMIN_PRIVATE_KEY=${ADMIN_PRIVATE_KEY:-0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80}
+      - API_PORT=3000
+      - LOG_LEVEL=debug
+    volumes:
+      - ./src:/app/src
+      - ./dist:/app/dist
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      hardhat-node:
+        condition: service_healthy
+    command: npm run dev
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - tourist-rewards-network
+
+  # Monitoring service (optional for development)
+  monitoring:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+      target: development
+    container_name: tourist-rewards-monitoring-dev
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/tourist_rewards_dev
+      - REDIS_URL=redis://redis:6379
+      - RPC_URL=http://hardhat-node:8545
+      - CONTRACT_ADDRESS=${CONTRACT_ADDRESS:-}
+    volumes:
+      - ./src:/app/src
+      - ./dist:/app/dist
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      hardhat-node:
+        condition: service_healthy
+    command: node dist/scripts/monitoring-cli.js
+    networks:
+      - tourist-rewards-network
+    profiles:
+      - monitoring
+
+volumes:
+  postgres_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+
+networks:
+  tourist-rewards-network:
+    driver: bridge
+    name: tourist-rewards-dev
