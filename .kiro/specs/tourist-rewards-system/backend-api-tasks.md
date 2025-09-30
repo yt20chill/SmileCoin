@@ -23,7 +23,7 @@ This task list covers the backend API endpoints for users and restaurants, exclu
   - Create restaurant analytics view for dashboard queries
   - _Focus: Database structure and migrations_
 
-- [ ] 3. User Registration and Authentication System
+- [x] 3. User Registration and Authentication System
 
   - Implement user registration endpoint accepting origin country, arrival/departure dates, and wallet address
   - Create JWT-based authentication system without email/password

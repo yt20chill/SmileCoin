@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  originCountry String   @map("origin_country")
+  arrivalDate   DateTime @map("arrival_date")
+  departureDate DateTime @map("departure_date")
+  walletAddress String   @unique @map("wallet_address")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  transactions Transaction[]
+  dailyRewards DailyReward[]
+
+  @@index([originCountry], name: "idx_users_origin_country")
+  @@index([arrivalDate], name: "idx_users_arrival_date")
+  @@index([departureDate], name: "idx_users_departure_date")
+  @@map("users")
+}
+
+model Restaurant {
+  id                  String   @id @default(cuid())
+  googlePlaceId       String   @unique @map("google_place_id")
+  name                String
+  address             String
+  latitude            Decimal  @db.Decimal(10, 8)
+  longitude           Decimal  @db.Decimal(11, 8)
+  walletAddress       String   @unique @map("wallet_address")
+  qrCodeData          String   @map("qr_code_data")
+  totalCoinsReceived  Int      @default(0) @map("total_coins_received")
+  dailyCoinsCache     Json     @default("{}") @map("daily_coins_cache")
+  lastRankingUpdate   DateTime @default(now()) @map("last_ranking_update")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  transactions Transaction[]
+
+  @@index([latitude, longitude], name: "idx_restaurants_location")
+  @@index([totalCoinsReceived], name: "idx_restaurants_total_coins")
+  @@index([name], name: "idx_restaurants_name")
+  @@index([lastRankingUpdate], name: "idx_restaurants_ranking_update")
+  @@map("restaurants")
+}
+
+model Transaction {
+  id                String   @id @default(cuid())
+  blockchainHash    String   @unique @map("blockchain_hash")
+  fromAddress       String   @map("from_address")
+  toAddress         String   @map("to_address")
+  userId            String   @map("user_id")
+  restaurantId      String   @map("restaurant_id")
+  amount            Int
+  transactionDate   DateTime @map("transaction_date")
+  userOriginCountry String   @map("user_origin_country")
+  blockNumber       BigInt?  @map("block_number")
+  gasUsed           BigInt?  @map("gas_used")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id])
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@index([userId], name: "idx_transactions_user")
+  @@index([restaurantId], name: "idx_transactions_restaurant")
+  @@index([transactionDate], name: "idx_transactions_date")
+  @@index([userOriginCountry], name: "idx_transactions_origin")
+  @@index([restaurantId, userOriginCountry], name: "idx_transactions_restaurant_origin")
+  @@index([transactionDate, restaurantId], name: "idx_transactions_date_restaurant")
+  @@map("transactions")
+}
+
+model DailyReward {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  rewardDate   DateTime @map("reward_date") @db.Date
+  coinsReceived Int     @default(10) @map("coins_received")
+  coinsGiven   Int      @default(0) @map("coins_given")
+  allCoinsGiven Boolean @default(false) @map("all_coins_given")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, rewardDate])
+  @@index([rewardDate], name: "idx_daily_rewards_date")
+  @@index([userId, rewardDate], name: "idx_daily_rewards_user_date")
+  @@map("daily_rewards")
+}
