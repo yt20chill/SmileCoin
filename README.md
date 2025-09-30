@@ -44,7 +44,7 @@ By combining gamification and blockchain, we aim to capture the spirit of Hong K
 - How **AWS Kiro** can act as a powerful co-pilot — helping us develop faster, debug more efficiently, streamline collaboration, and most importantly, guide us with a structured development plan while speeding up POC building.
 
 
-## What's next for Smile Travel HK x Smile Coin 微笑幣
+## What's next for Smile Travel HK x Smile Coin 微笑幣 😊
 - Launch MVP with basic wallet, merchant portal, and voucher redemption.
 - Add gift redemption center for travelers and Smile Coin perk system for merchants.
 - Develop mobile apps (iOS & Android) to make Smile Coins more accessible.
