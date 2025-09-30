@@ -128,7 +128,19 @@
       "originTracking": "Tourist origin tracking for analytics",
       "blockchainVerification": "Blockchain transaction verification",
       "fraudDetection": "Real-time fraud detection"
-    }
+    },
+    "errors": {
+      "enterPlaceId": "Please enter a Google Place ID",
+      "generateFailed": "Failed to generate QR code. Please try again."
+    },
+    "printTitle": "Restaurant QR Code",
+    "qrCodeAlt": "Restaurant QR Code",
+    "forTourists": "For Tourists",
+    "scanInstructions": "Scan this QR code with the SmileCoin app to give smile coins to this restaurant!",
+    "securityNote": "Blockchain-secured transaction",
+    "walletLabel": "Wallet",
+    "placeIdLabel": "Place ID",
+    "generatedLabel": "Generated"
   },
   "souvenir": {
     "title": "Physical SmileCoin Souvenir",

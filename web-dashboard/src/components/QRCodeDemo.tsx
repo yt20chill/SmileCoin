@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCodeGenerator from './QRCodeGenerator';
+import QRCodeComparison from './QRCodeComparison';
 import { DEMO_RESTAURANTS, generateRestaurants } from '../services/restaurantDataGenerator';
 
 const QRCodeDemo: React.FC = () => {
@@ -56,6 +57,9 @@ const QRCodeDemo: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* QR Code Comparison */}
+      {/* <QRCodeComparison /> */}
 
       {/* QR Code Generator */}
       <QRCodeGenerator restaurantId={selectedDemo} />

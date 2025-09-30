@@ -3,18 +3,15 @@ export interface RestaurantQRData {
   restaurantName: string;
   walletAddress: string;
   timestamp: number;
-  signature?: string;
+  signature: string;
 }
 
-export interface QRCodeGenerationResult {
+export interface QRCodeResponse {
   qrCodeImage: string;
   qrData: RestaurantQRData;
-  printableHTML: string;
-}
-
-export interface RestaurantInfo {
-  placeId: string;
-  name: string;
-  address: string;
-  walletAddress: string;
+  restaurant: {
+    name: string;
+    address: string;
+    placeId: string;
+  };
 }
