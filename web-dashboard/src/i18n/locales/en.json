@@ -26,7 +26,8 @@
     "dashboard": "Dashboard",
     "qrGenerator": "QR Code Generator",
     "souvenirProgress": "Souvenir Progress",
-    "voucherRedemption": "Voucher Redemption"
+    "voucherRedemption": "Voucher Redemption",
+    "restaurantManagement": "Restaurant Management"
   },
   "dashboard": {
     "title": "Restaurant Management System",

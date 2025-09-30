@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import QRCodeDemo from './components/QRCodeDemo';
 import SouvenirProgress from './components/SouvenirProgress';
 import VoucherRedemption from './components/VoucherRedemption';
+import RestaurantManagement from './components/RestaurantManagement';
 import LanguageSelector from './components/LanguageSelector';
 
 function Navigation() {
@@ -55,6 +56,16 @@ function Navigation() {
           >
             {t('navigation.voucherRedemption')}
           </Link>
+          <Link
+            to="/restaurant-management"
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              location.pathname === '/restaurant-management'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Restaurant Management
+          </Link>
         </div>
       </div>
     </nav>
@@ -90,6 +101,7 @@ function App() {
             <Route path="/qr-generator" element={<QRCodeDemo />} />
             <Route path="/souvenir-progress" element={<SouvenirProgress />} />
             <Route path="/voucher-redemption" element={<VoucherRedemption />} />
+            <Route path="/restaurant-management" element={<RestaurantManagement />} />
           </Routes>
         </main>
       </div>

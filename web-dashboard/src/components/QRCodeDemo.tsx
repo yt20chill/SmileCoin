@@ -1,31 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCodeGenerator from './QRCodeGenerator';
+import { DEMO_RESTAURANTS, generateRestaurants } from '../services/restaurantDataGenerator';
 
 const QRCodeDemo: React.FC = () => {
   const { t } = useTranslation();
-  const [selectedDemo, setSelectedDemo] = useState<string>('demo-restaurant-123');
+  const [selectedDemo, setSelectedDemo] = useState<string>('ChIJN1t_tDeuEmsRUsoyG83frY4');
+  const [allRestaurants, setAllRestaurants] = useState(DEMO_RESTAURANTS);
 
-  const demoRestaurants = [
-    { 
-      id: 'demo-restaurant-123', 
-      name: t('restaurants.goldenDragon'),
-      placeId: 'ChIJN1t_tDeuEmsRUsoyG83frY4',
-      address: t('locations.central')
-    },
-    { 
-      id: 'demo-restaurant-456', 
-      name: t('restaurants.harbourView'),
-      placeId: 'ChIJrTLr-GyuEmsRBfy61i59si0',
-      address: t('locations.tsimShaTsui')
-    },
-    { 
-      id: 'demo-restaurant-789', 
-      name: t('restaurants.peakDining'),
-      placeId: 'ChIJ2eUgeAK6EmsRqRfr6hFrw-M',
-      address: t('locations.thePeak')
-    }
-  ];
+  useEffect(() => {
+    // Generate additional restaurants for demo
+    const additionalRestaurants = generateRestaurants(20);
+    setAllRestaurants([...DEMO_RESTAURANTS, ...additionalRestaurants.slice(0, 12)]);
+  }, []);
+
+  const demoRestaurants = allRestaurants.slice(0, 15); // Show first 15 restaurants
 
   return (
     <div className="space-y-8">
@@ -46,7 +35,7 @@ const QRCodeDemo: React.FC = () => {
       {/* Demo Restaurant Selector */}
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('qrGenerator.demo.tryDemo')}</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {demoRestaurants.map((restaurant) => (
             <button
               key={restaurant.id}
@@ -57,9 +46,12 @@ const QRCodeDemo: React.FC = () => {
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              <h4 className="font-medium text-gray-900">{restaurant.name}</h4>
-              <p className="text-sm text-gray-600 mt-1">{restaurant.address}</p>
-              <p className="text-xs text-gray-500 mt-2">Place ID: {restaurant.placeId}</p>
+              <h4 className="font-medium text-gray-900 text-sm">{restaurant.name}</h4>
+              <p className="text-xs text-gray-600 mt-1">{restaurant.address}</p>
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-xs text-blue-600">{restaurant.cuisine}</span>
+                <span className="text-xs text-gray-500">{restaurant.priceRange}</span>
+              </div>
             </button>
           ))}
         </div>
@@ -70,15 +62,15 @@ const QRCodeDemo: React.FC = () => {
 
       {/* How it Works */}
       <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">How the QR Code System Works</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('qrGenerator.demo.howItWorks')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="text-center">
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <span className="text-blue-600 font-bold">1</span>
             </div>
-            <h4 className="font-medium text-gray-900 mb-2">Restaurant Setup</h4>
+            <h4 className="font-medium text-gray-900 mb-2">{t('qrGenerator.demo.step1Title')}</h4>
             <p className="text-sm text-gray-600">
-              Restaurant generates QR code using their Google Place ID and prints it
+              {t('qrGenerator.demo.step1Desc')}
             </p>
           </div>
           
@@ -86,9 +78,9 @@ const QRCodeDemo: React.FC = () => {
             <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <span className="text-green-600 font-bold">2</span>
             </div>
-            <h4 className="font-medium text-gray-900 mb-2">Tourist Visits</h4>
+            <h4 className="font-medium text-gray-900 mb-2">{t('qrGenerator.demo.step2Title')}</h4>
             <p className="text-sm text-gray-600">
-              Tourist dines at restaurant and scans the QR code with mobile app
+              {t('qrGenerator.demo.step2Desc')}
             </p>
           </div>
           
@@ -96,9 +88,9 @@ const QRCodeDemo: React.FC = () => {
             <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <span className="text-yellow-600 font-bold">3</span>
             </div>
-            <h4 className="font-medium text-gray-900 mb-2">Give Coins</h4>
+            <h4 className="font-medium text-gray-900 mb-2">{t('qrGenerator.demo.step3Title')}</h4>
             <p className="text-sm text-gray-600">
-              Tourist selects 1-3 smile coins to give to the restaurant
+              {t('qrGenerator.demo.step3Desc')}
             </p>
           </div>
           
@@ -106,9 +98,9 @@ const QRCodeDemo: React.FC = () => {
             <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <span className="text-purple-600 font-bold">4</span>
             </div>
-            <h4 className="font-medium text-gray-900 mb-2">Blockchain Transaction</h4>
+            <h4 className="font-medium text-gray-900 mb-2">{t('qrGenerator.demo.step4Title')}</h4>
             <p className="text-sm text-gray-600">
-              Coins are transferred via blockchain and recorded transparently
+              {t('qrGenerator.demo.step4Desc')}
             </p>
           </div>
         </div>
@@ -116,24 +108,24 @@ const QRCodeDemo: React.FC = () => {
 
       {/* Security Features */}
       <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Security Features</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('qrGenerator.security.title')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">QR Code Security</h4>
+            <h4 className="font-medium text-gray-900 mb-2">{t('qrGenerator.security.qrSecurity')}</h4>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Cryptographic signature validation</li>
-              <li>• Time-based expiration (24 hours)</li>
-              <li>• Google Place ID verification</li>
-              <li>• Tamper-proof wallet addresses</li>
+              <li>• {t('qrGenerator.security.cryptoValidation')}</li>
+              <li>• {t('qrGenerator.security.timeExpiration')}</li>
+              <li>• {t('qrGenerator.security.placeIdVerification')}</li>
+              <li>• {t('qrGenerator.security.tamperProof')}</li>
             </ul>
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Transaction Limits</h4>
+            <h4 className="font-medium text-gray-900 mb-2">{t('qrGenerator.security.transactionLimits')}</h4>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Maximum 3 coins per restaurant per day</li>
-              <li>• Tourist origin tracking for analytics</li>
-              <li>• Blockchain transaction verification</li>
-              <li>• Real-time fraud detection</li>
+              <li>• {t('qrGenerator.security.maxCoins')}</li>
+              <li>• {t('qrGenerator.security.originTracking')}</li>
+              <li>• {t('qrGenerator.security.blockchainVerification')}</li>
+              <li>• {t('qrGenerator.security.fraudDetection')}</li>
             </ul>
           </div>
         </div>
