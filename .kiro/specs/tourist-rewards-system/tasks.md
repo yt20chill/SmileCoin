@@ -30,7 +30,7 @@
   - Create contract interaction utilities for backend
   - _Requirements: 1, 2, 5, 6_
 
-- [ ] 5. Restaurant Management and Google Maps Integration
+- [x] 5. Restaurant Management and Google Maps Integration
   - Set up Google Maps Places API configuration and API keys
   - Implement nearby restaurants search using GPS coordinates with database caching
   - Create restaurant registration system using Google Place IDs
