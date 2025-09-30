@@ -1,0 +1,822 @@
+{
+  "info": {
+    "name": "Tourist Rewards API",
+    "description": "Complete API collection for Tourist Rewards System - A blockchain-based rewards platform for tourists and restaurants in Hong Kong",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "restaurantId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "walletAddress",
+      "value": "0x742d35Cc6634C0532925a3b8D4C2C4e4C4C4C4C4",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', response.data.token);",
+                  "    pm.collectionVariables.set('userId', response.data.user.id);",
+                  "    pm.test('User registered successfully', function () {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data.token).to.be.a('string');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"originCountry\": \"United States\",\n  \"arrivalDate\": \"2024-01-15T10:00:00Z\",\n  \"departureDate\": \"2024-01-22T15:00:00Z\",\n  \"walletAddress\": \"{{walletAddress}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new tourist user with travel details and wallet address"
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', response.data.token);",
+                  "    pm.collectionVariables.set('userId', response.data.user.id);",
+                  "    pm.test('Login successful', function () {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data.token).to.be.a('string');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"walletAddress\": \"{{walletAddress}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login user with wallet address (no password required)"
+          }
+        },
+        {
+          "name": "Get User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Profile retrieved successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data.user).to.be.an('object');",
+                  "    pm.expect(response.data.statistics).to.be.an('object');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "profile"]
+            },
+            "description": "Get authenticated user's profile with statistics"
+          }
+        },
+        {
+          "name": "Verify Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "verify"]
+            },
+            "description": "Verify if JWT token is valid"
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', response.data.token);",
+                  "    pm.test('Token refreshed successfully', function () {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data.token).to.be.a('string');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Refresh JWT token to extend session"
+          }
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Logout user and invalidate session"
+          }
+        }
+      ],
+      "description": "User authentication and session management endpoints"
+    },
+    {
+      "name": "Restaurants",
+      "item": [
+        {
+          "name": "Register Restaurant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('restaurantId', response.data.restaurant.id);",
+                  "    pm.test('Restaurant registered successfully', function () {",
+                  "        pm.expect(response.success).to.be.true;",
+                  "        pm.expect(response.data.restaurant.qrCodeData).to.be.a('string');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"googlePlaceId\": \"ChIJN1t_tDeuEmsRUsoyG83frY4\",\n  \"walletAddress\": \"0x1111111111111111111111111111111111111111\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/restaurants/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["restaurants", "register"]
+            },
+            "description": "Register a new restaurant using Google Place ID"
+          }
+        },
+        {
+          "name": "Get Nearby Restaurants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/restaurants/nearby?lat=22.3193&lng=114.1694&radius=5000",
+              "host": ["{{baseUrl}}"],
+              "path": ["restaurants", "nearby"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "22.3193",
+                  "description": "Latitude (Hong Kong)"
+                },
+                {
+                  "key": "lng",
+                  "value": "114.1694",
+                  "description": "Longitude (Hong Kong)"
+                },
+                {
+                  "key": "radius",
+                  "value": "5000",
+                  "description": "Search radius in meters"
+                },
+                {
+                  "key": "type",
+                  "value": "restaurant",
+                  "description": "Place type filter",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "dim sum",
+                  "description": "Search keyword",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Find nearby restaurants using GPS coordinates"
+          }
+        },
+        {
+          "name": "Search Restaurants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/restaurants/search?q=dim sum&lat=22.3193&lng=114.1694&radius=5000",
+              "host": ["{{baseUrl}}"],
+              "path": ["restaurants", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "dim sum",
+                  "description": "Search query"
+                },
+                {
+                  "key": "lat",
+                  "value": "22.3193",
+                  "description": "Latitude (optional)"
+                },
+                {
+                  "key": "lng",
+                  "value": "114.1694",
+                  "description": "Longitude (optional)"
+                },
+                {
+                  "key": "radius",
+                  "value": "5000",
+                  "description": "Search radius in meters (optional)"
+                }
+              ]
+            },
+            "description": "Search restaurants by text query"
+          }
+        },
+        {
+          "name": "Get Restaurant Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/restaurants/details/ChIJN1t_tDeuEmsRUsoyG83frY4",
+              "host": ["{{baseUrl}}"],
+              "path": ["restaurants", "details", "ChIJN1t_tDeuEmsRUsoyG83frY4"]
+            },
+            "description": "Get restaurant details using Google Place ID"
+          }
+        },
+        {
+          "name": "List Restaurants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/restaurants?page=1&limit=10&sortBy=totalCoins&sortOrder=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["restaurants"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "totalCoins",
+                  "description": "Sort field"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc",
+                  "description": "Sort order"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search query",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List restaurants with pagination and filtering"
+          }
+        },
+        {
+          "name": "Get Restaurant Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/restaurants/{{restaurantId}}/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["restaurants", "{{restaurantId}}", "profile"]
+            },
+            "description": "Get restaurant profile with Google Maps data"
+          }
+        },
+        {
+          "name": "Verify QR Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qrCodeData\": \"{\\\"googlePlaceId\\\":\\\"ChIJN1t_tDeuEmsRUsoyG83frY4\\\",\\\"walletAddress\\\":\\\"0x1111111111111111111111111111111111111111\\\"}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/restaurants/qr/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["restaurants", "qr", "verify"]
+            },
+            "description": "Verify QR code data for restaurant"
+          }
+        }
+      ],
+      "description": "Restaurant management and discovery endpoints"
+    },
+    {
+      "name": "Rankings",
+      "item": [
+        {
+          "name": "Global Restaurant Rankings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rankings/global?limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["rankings", "global"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of top restaurants to return"
+                }
+              ]
+            },
+            "description": "Get global restaurant rankings by total smile coins"
+          }
+        },
+        {
+          "name": "Origin-Based Rankings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rankings/origin?country=United States&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["rankings", "origin"],
+              "query": [
+                {
+                  "key": "country",
+                  "value": "United States",
+                  "description": "Tourist origin country"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of restaurants to return"
+                }
+              ]
+            },
+            "description": "Get restaurant rankings based on tourist origin country"
+          }
+        },
+        {
+          "name": "Nearby Rankings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rankings/nearby?lat=22.3193&lng=114.1694&radius=5000&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["rankings", "nearby"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "22.3193",
+                  "description": "Latitude"
+                },
+                {
+                  "key": "lng",
+                  "value": "114.1694",
+                  "description": "Longitude"
+                },
+                {
+                  "key": "radius",
+                  "value": "5000",
+                  "description": "Search radius in meters"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of restaurants to return"
+                }
+              ]
+            },
+            "description": "Get nearby restaurant rankings with GPS integration"
+          }
+        },
+        {
+          "name": "Refresh Rankings",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rankings/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["rankings", "refresh"]
+            },
+            "description": "Manually refresh restaurant rankings (for demo purposes)"
+          }
+        }
+      ],
+      "description": "Restaurant ranking and statistics endpoints"
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Record Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurantId\": \"{{restaurantId}}\",\n  \"amount\": 2,\n  \"blockchainHash\": \"0xabc123def456ghi789jkl012mno345pqr678stu901vwx234yzab567cde890fgh123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["transactions"]
+            },
+            "description": "Record a smile coin transaction"
+          }
+        },
+        {
+          "name": "Get User Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/user?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["transactions", "user"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Get transaction history for authenticated user"
+          }
+        },
+        {
+          "name": "Get Restaurant Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/restaurant/{{restaurantId}}?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["transactions", "restaurant", "{{restaurantId}}"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Get transaction history for a specific restaurant"
+          }
+        },
+        {
+          "name": "Validate Daily Limit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurantId\": \"{{restaurantId}}\",\n  \"amount\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transactions/validate-limit",
+              "host": ["{{baseUrl}}"],
+              "path": ["transactions", "validate-limit"]
+            },
+            "description": "Validate if user can give coins to restaurant (daily limit check)"
+          }
+        }
+      ],
+      "description": "Transaction recording and validation endpoints"
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Restaurant Daily Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/restaurant/{{restaurantId}}/daily-stats?startDate=2024-01-01&endDate=2024-01-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "restaurant", "{{restaurantId}}", "daily-stats"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01",
+                  "description": "Start date for statistics"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31",
+                  "description": "End date for statistics"
+                }
+              ]
+            },
+            "description": "Get daily statistics for restaurant dashboard"
+          }
+        },
+        {
+          "name": "Restaurant Total Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/restaurant/{{restaurantId}}/total-stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "restaurant", "{{restaurantId}}", "total-stats"]
+            },
+            "description": "Get total statistics for restaurant dashboard"
+          }
+        },
+        {
+          "name": "Tourist Origin Breakdown",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/restaurant/{{restaurantId}}/origin-breakdown",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "restaurant", "{{restaurantId}}", "origin-breakdown"]
+            },
+            "description": "Get tourist origin breakdown for restaurant"
+          }
+        },
+        {
+          "name": "Performance Trends",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/restaurant/{{restaurantId}}/trends?period=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "restaurant", "{{restaurantId}}", "trends"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "30",
+                  "description": "Number of days for trend analysis"
+                }
+              ]
+            },
+            "description": "Get performance trends for restaurant"
+          }
+        }
+      ],
+      "description": "Restaurant dashboard and analytics endpoints"
+    },
+    {
+      "name": "Physical Coins",
+      "item": [
+        {
+          "name": "Get Progress",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/physical-coin/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["physical-coin", "progress"]
+            },
+            "description": "Get user's physical coin souvenir progress"
+          }
+        },
+        {
+          "name": "Check Eligibility",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/physical-coin/eligibility",
+              "host": ["{{baseUrl}}"],
+              "path": ["physical-coin", "eligibility"]
+            },
+            "description": "Check if user is eligible for physical coin voucher"
+          }
+        },
+        {
+          "name": "Generate Voucher",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/physical-coin/voucher",
+              "host": ["{{baseUrl}}"],
+              "path": ["physical-coin", "voucher"]
+            },
+            "description": "Generate physical coin voucher for eligible user"
+          }
+        }
+      ],
+      "description": "Physical coin souvenir tracking endpoints"
+    },
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["health"]
+            },
+            "description": "Check system health and service status"
+          }
+        },
+        {
+          "name": "API Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "description": "Get API information and available endpoints"
+          }
+        }
+      ],
+      "description": "System health and information endpoints"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-set authorization header if token exists",
+          "const token = pm.collectionVariables.get('authToken');",
+          "if (token && !pm.request.headers.has('Authorization')) {",
+          "    pm.request.headers.add({",
+          "        key: 'Authorization',",
+          "        value: `Bearer ${token}`",
+          "    });",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test for response time",
+          "pm.test('Response time is less than 5000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "// Global test for content type",
+          "pm.test('Content-Type is application/json', function () {",
+          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "});"
+        ]
+      }
+    }
+  ]
+}

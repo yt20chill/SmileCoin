@@ -6,10 +6,7 @@ jest.mock('@googlemaps/google-maps-services-js');
 
 describe('GoogleMapsService', () => {
   beforeAll(async () => {
-    // Ensure Redis connection for tests
-    if (!redisClient.isClientConnected()) {
-      await redisClient.connect();
-    }
+    // Redis connection is handled in global setup
   });
 
   afterAll(async () => {

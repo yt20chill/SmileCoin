@@ -1,4 +1,3 @@
-import { describe, it } from 'node:test';
 import request from 'supertest';
 import App from '../app';
 import { prisma } from '../config/database';
@@ -12,11 +11,9 @@ describe('Ranking API Endpoints', () => {
   let testTransactions: any[] = [];
 
   beforeAll(async () => {
-    // Connect to Redis if not already connected
-    if (!redisClient.isClientConnected()) {
-      await redisClient.connect();
-    }
-
+    // Increase timeout for data setup
+    jest.setTimeout(30000);
+    
     // Clean up existing test data (with error handling for test environment)
     try {
       await prisma.transaction.deleteMany({
@@ -45,35 +42,42 @@ describe('Ranking API Endpoints', () => {
     }
 
     // Create test users from different countries
-    testUsers = await Promise.all([
-      prisma.user.create({
-        data: {
-          originCountry: 'United States',
-          arrivalDate: new Date('2024-01-01'),
-          departureDate: new Date('2024-01-10'),
-          walletAddress: '0x1234567890123456789012345678901234567890'
-        }
-      }),
-      prisma.user.create({
-        data: {
-          originCountry: 'Japan',
-          arrivalDate: new Date('2024-01-02'),
-          departureDate: new Date('2024-01-12'),
-          walletAddress: '0x1234567890123456789012345678901234567891'
-        }
-      }),
-      prisma.user.create({
-        data: {
-          originCountry: 'United Kingdom',
-          arrivalDate: new Date('2024-01-03'),
-          departureDate: new Date('2024-01-13'),
-          walletAddress: '0x1234567890123456789012345678901234567892'
-        }
-      })
-    ]);
+    try {
+      testUsers = await Promise.all([
+        prisma.user.create({
+          data: {
+            originCountry: 'United States',
+            arrivalDate: new Date('2024-01-01'),
+            departureDate: new Date('2024-01-10'),
+            walletAddress: '0x1234567890123456789012345678901234567890'
+          }
+        }),
+        prisma.user.create({
+          data: {
+            originCountry: 'Japan',
+            arrivalDate: new Date('2024-01-02'),
+            departureDate: new Date('2024-01-12'),
+            walletAddress: '0x1234567890123456789012345678901234567891'
+          }
+        }),
+        prisma.user.create({
+          data: {
+            originCountry: 'United Kingdom',
+            arrivalDate: new Date('2024-01-03'),
+            departureDate: new Date('2024-01-13'),
+            walletAddress: '0x1234567890123456789012345678901234567892'
+          }
+        })
+      ]);
+      console.log('Created test users:', testUsers.length);
+    } catch (error) {
+      console.error('Error creating test users:', error);
+      throw error;
+    }
 
     // Create test restaurants with different locations and coin amounts
-    testRestaurants = await Promise.all([
+    try {
+      testRestaurants = await Promise.all([
       prisma.restaurant.create({
         data: {
           googlePlaceId: 'test_place_1',
@@ -110,9 +114,15 @@ describe('Ranking API Endpoints', () => {
           totalCoinsReceived: 50
         }
       })
-    ]);
+      ]);
+      console.log('Created test restaurants:', testRestaurants.length);
+    } catch (error) {
+      console.error('Error creating test restaurants:', error);
+      throw error;
+    }
 
     // Create test transactions with different origin countries
+    try {
     testTransactions = await Promise.all([
       // US user transactions
       prisma.transaction.create({
@@ -178,16 +188,34 @@ describe('Ranking API Endpoints', () => {
         }
       })
     ]);
+      console.log('Created test transactions:', testTransactions.length);
+    } catch (error) {
+      console.error('Error creating test transactions:', error);
+      throw error;
+    }
 
     // Clear Redis cache
-    await redisClient.getClient().flushAll();
+    await redisClient.flushAll();
 
-    // Verify test data was created
+    // Verify test data was created and is accessible
     const userCount = await prisma.user.count();
     const restaurantCount = await prisma.restaurant.count();
     const transactionCount = await prisma.transaction.count();
     
     console.log(`Test setup complete: ${userCount} users, ${restaurantCount} restaurants, ${transactionCount} transactions`);
+    console.log('Test users:', testUsers.map(u => ({ id: u.id, country: u.originCountry })));
+    console.log('Test restaurants:', testRestaurants.map(r => ({ id: r.id, name: r.name })));
+    
+    // Validate that we have the expected test data
+    if (testUsers.length !== 3) {
+      throw new Error(`Expected 3 test users, got ${testUsers.length}`);
+    }
+    if (testRestaurants.length !== 3) {
+      throw new Error(`Expected 3 test restaurants, got ${testRestaurants.length}`);
+    }
+    if (testTransactions.length !== 5) {
+      throw new Error(`Expected 5 test transactions, got ${testTransactions.length}`);
+    }
   });
 
   afterAll(async () => {
@@ -214,7 +242,7 @@ describe('Ranking API Endpoints', () => {
           }
         }
       });
-      await redisClient.getClient().flushAll();
+      await redisClient.flushAll();
     } catch (error) {
       console.log('Cleanup error (expected in test env):', error);
     }
@@ -513,7 +541,7 @@ describe('Ranking API Endpoints', () => {
   describe('Caching', () => {
     it('should cache ranking results', async () => {
       // Clear cache first
-      await redisClient.getClient().flushAll();
+      await redisClient.flushAll();
 
       // First request - should hit database
       const start1 = Date.now();
@@ -541,7 +569,7 @@ describe('Ranking API Endpoints', () => {
       const restaurantId = testRestaurants[0].id;
 
       // Clear cache first
-      await redisClient.getClient().flushAll();
+      await redisClient.flushAll();
 
       // First request
       const response1 = await request(app)

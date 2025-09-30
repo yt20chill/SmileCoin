@@ -1,7 +1,6 @@
 import request from 'supertest';
 import App from '../app';
 import { prisma } from '../config/database';
-import { redisClient } from '../config/redis';
 
 describe('Authentication System E2E Tests', () => {
   let app: App;
@@ -12,10 +11,7 @@ describe('Authentication System E2E Tests', () => {
     app = new App();
     server = app.getApp();
     
-    // Connect to Redis if not already connected
-    if (!redisClient.isClientConnected()) {
-      await redisClient.connect();
-    }
+    // Redis connection is handled in global setup
   });
 
   afterAll(async () => {

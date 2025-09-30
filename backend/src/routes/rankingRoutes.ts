@@ -24,8 +24,93 @@ const handleValidationErrors = (req: Request, res: Response, next: NextFunction)
 };
 
 /**
- * GET /api/v1/rankings/overall
- * Get overall restaurant rankings based on total smile coins
+ * @swagger
+ * /rankings/overall:
+ *   get:
+ *     tags: [Rankings]
+ *     summary: Get overall restaurant rankings
+ *     description: Get restaurants ranked by total smile coins received from all tourists
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
+ *         description: Number of restaurants per page
+ *       - in: query
+ *         name: lat
+ *         schema:
+ *           type: number
+ *           format: double
+ *           minimum: -90
+ *           maximum: 90
+ *         description: Latitude for location-based filtering (optional)
+ *       - in: query
+ *         name: lng
+ *         schema:
+ *           type: number
+ *           format: double
+ *           minimum: -180
+ *           maximum: 180
+ *         description: Longitude for location-based filtering (optional)
+ *       - in: query
+ *         name: radius
+ *         schema:
+ *           type: number
+ *           format: float
+ *           minimum: 0.1
+ *           maximum: 50
+ *         description: Search radius in kilometers (optional)
+ *     responses:
+ *       200:
+ *         description: Restaurant rankings retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     rankings:
+ *                       type: array
+ *                       items:
+ *                         allOf:
+ *                           - $ref: '#/components/schemas/Restaurant'
+ *                           - type: object
+ *                             properties:
+ *                               rank:
+ *                                 type: integer
+ *                                 description: Current ranking position
+ *                               distance:
+ *                                 type: number
+ *                                 format: float
+ *                                 description: Distance from search location (if provided)
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         page:
+ *                           type: integer
+ *                         limit:
+ *                           type: integer
+ *                         total:
+ *                           type: integer
+ *                         totalPages:
+ *                           type: integer
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
  */
 router.get('/overall', [
   query('page')
@@ -118,8 +203,38 @@ router.get('/statistics/:restaurantId', [
 ], handleValidationErrors, rankingController.getRestaurantStatistics.bind(rankingController));
 
 /**
- * POST /api/v1/rankings/refresh
- * Manual ranking refresh endpoint for demo purposes
+ * @swagger
+ * /rankings/refresh:
+ *   post:
+ *     tags: [Rankings]
+ *     summary: Refresh restaurant rankings
+ *     description: Manually refresh restaurant rankings for demo purposes. Recalculates all ranking data from current transactions.
+ *     responses:
+ *       200:
+ *         description: Rankings refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Rankings refreshed successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     updatedRestaurants:
+ *                       type: integer
+ *                       description: Number of restaurants updated
+ *                     refreshTimestamp:
+ *                       type: string
+ *                       format: date-time
+ *                       description: When the refresh was completed
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.post('/refresh', rankingController.refreshRankings.bind(rankingController));
 

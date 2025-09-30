@@ -4,11 +4,13 @@ import express, { Application, NextFunction, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import * as swaggerUi from 'swagger-ui-express';
 
 import { corsOptions } from './config/cors';
 import { prisma } from './config/database';
 import { config } from './config/environment';
 import { redisClient } from './config/redis';
+import { swaggerSpec } from './config/swagger';
 
 class App {
   public app: Application;
@@ -68,6 +70,19 @@ class App {
   }
 
   private initializeRoutes(): void {
+    // API Documentation
+    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+      explorer: true,
+      customCss: '.swagger-ui .topbar { display: none }',
+      customSiteTitle: 'Tourist Rewards API Documentation',
+    }));
+
+    // Swagger JSON endpoint
+    this.app.get('/api-docs.json', (req: Request, res: Response) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(swaggerSpec);
+    });
+
     // Health check endpoint
     this.app.get('/health', async (req: Request, res: Response) => {
       try {

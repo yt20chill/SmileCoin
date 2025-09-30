@@ -148,6 +148,16 @@ export class TransactionService {
       };
     });
 
+    // Update physical coin tracking (outside of database transaction to avoid blocking)
+    try {
+      // Import here to avoid circular dependency
+      const { physicalCoinService } = await import('./physicalCoinService');
+      await physicalCoinService.updateCoinsGiven(userId, amount, new Date());
+    } catch (error) {
+      // Log error but don't fail the transaction
+      console.error('Failed to update physical coin tracking:', error);
+    }
+
     return result;
   }
 

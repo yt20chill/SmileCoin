@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './authRoutes';
 import dashboardRoutes from './dashboardRoutes';
+import physicalCoinRoutes from './physicalCoinRoutes';
 import rankingRoutes from './rankingRoutes';
 import restaurantRoutes from './restaurantRoutes';
 import transactionRoutes from './transactionRoutes';
@@ -25,5 +26,8 @@ router.use('/rankings', rankingRoutes);
 
 // Transaction routes
 router.use('/transactions', transactionRoutes);
+
+// Physical coin souvenir routes
+router.use('/physical-coin', physicalCoinRoutes);
 
 export default router;

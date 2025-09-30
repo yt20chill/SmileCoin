@@ -133,17 +133,19 @@ const redisClient = new RedisClient();
 
 export { redisClient };
 
-// Graceful shutdown
-process.on('beforeExit', async () => {
-  await redisClient.disconnect();
-});
+// Graceful shutdown - only in non-test environments
+if (process.env.NODE_ENV !== 'test') {
+  process.on('beforeExit', async () => {
+    await redisClient.disconnect();
+  });
 
-process.on('SIGINT', async () => {
-  await redisClient.disconnect();
-  process.exit(0);
-});
+  process.on('SIGINT', async () => {
+    await redisClient.disconnect();
+    process.exit(0);
+  });
 
-process.on('SIGTERM', async () => {
-  await redisClient.disconnect();
-  process.exit(0);
-});
+  process.on('SIGTERM', async () => {
+    await redisClient.disconnect();
+    process.exit(0);
+  });
+}

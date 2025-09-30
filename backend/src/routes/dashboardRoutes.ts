@@ -21,8 +21,71 @@ const handleValidationErrors = (req: Request, res: Response, next: NextFunction)
 };
 
 /**
- * GET /api/v1/restaurants/:id/dashboard/daily-stats
- * Get daily statistics for a restaurant with date filtering
+ * @swagger
+ * /restaurants/{id}/dashboard/daily-stats:
+ *   get:
+ *     tags: [Dashboard]
+ *     summary: Get restaurant daily statistics
+ *     description: Get daily statistics for a restaurant with optional date filtering and origin country breakdown
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Restaurant ID
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for statistics (ISO 8601 format)
+ *         example: "2024-01-01"
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for statistics (ISO 8601 format)
+ *         example: "2024-01-31"
+ *       - in: query
+ *         name: originCountry
+ *         schema:
+ *           type: string
+ *         description: Filter by tourist origin country
+ *         example: "United States"
+ *     responses:
+ *       200:
+ *         description: Daily statistics retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     dailyStats:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/DailyStats'
+ *                     summary:
+ *                       type: object
+ *                       properties:
+ *                         totalCoins:
+ *                           type: integer
+ *                         totalTransactions:
+ *                           type: integer
+ *                         averageCoinsPerDay:
+ *                           type: number
+ *                           format: float
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
  */
 router.get('/restaurants/:id/dashboard/daily-stats', [
   param('id')

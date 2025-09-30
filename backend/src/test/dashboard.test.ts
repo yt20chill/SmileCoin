@@ -1,4 +1,4 @@
-import { describe, it } from 'node:test';
+// Using Jest test framework (no imports needed)
 import request from 'supertest';
 import App from '../app';
 import { prisma } from '../config/database';
@@ -12,6 +12,11 @@ describe('Dashboard API Endpoints', () => {
   let testTransactionId: string;
 
   beforeAll(async () => {
+    // Increase timeout for data setup
+    jest.setTimeout(30000);
+    
+    console.log('Starting dashboard test setup...');
+    
     // Clean up any existing test data
     await prisma.transaction.deleteMany({
       where: {
@@ -32,37 +37,49 @@ describe('Dashboard API Endpoints', () => {
     });
 
     // Create test user
-    const testUser = await prisma.user.create({
-      data: {
-        originCountry: 'TEST_COUNTRY',
-        arrivalDate: new Date('2024-01-01'),
-        departureDate: new Date('2024-01-15'),
-        walletAddress: '0x1234567890123456789012345678901234567890',
-      },
-    });
-    testUserId = testUser.id;
+    try {
+      const testUser = await prisma.user.create({
+        data: {
+          originCountry: 'TEST_COUNTRY',
+          arrivalDate: new Date('2024-01-01'),
+          departureDate: new Date('2024-01-15'),
+          walletAddress: '0x1234567890123456789012345678901234567890',
+        },
+      });
+      testUserId = testUser.id;
+      console.log('Created test user with ID:', testUserId);
+    } catch (error) {
+      console.error('Error creating test user:', error);
+      throw error;
+    }
 
     // Create test restaurant
-    const testRestaurant = await prisma.restaurant.create({
-      data: {
-        googlePlaceId: 'test_place_id_dashboard',
-        name: 'Test Dashboard Restaurant',
-        address: '123 Test Street, Hong Kong',
-        latitude: 22.3193,
-        longitude: 114.1694,
-        walletAddress: '0x0987654321098765432109876543210987654321',
-        qrCodeData: 'test_qr_data_dashboard',
-        totalCoinsReceived: 50,
-      },
-    });
-    testRestaurantId = testRestaurant.id;
+    try {
+      const testRestaurant = await prisma.restaurant.create({
+        data: {
+          googlePlaceId: 'test_place_id_dashboard',
+          name: 'Test Dashboard Restaurant',
+          address: '123 Test Street, Hong Kong',
+          latitude: 22.3193,
+          longitude: 114.1694,
+          walletAddress: '0x0987654321098765432109876543210987654321',
+          qrCodeData: 'test_qr_data_dashboard',
+          totalCoinsReceived: 50,
+        },
+      });
+      testRestaurantId = testRestaurant.id;
+      console.log('Created test restaurant with ID:', testRestaurantId);
+    } catch (error) {
+      console.error('Error creating test restaurant:', error);
+      throw error;
+    }
 
     // Create test transactions with different dates and origins
     const transactions = [
       {
         blockchainHash: '0xtest1',
-        fromAddress: testUser.walletAddress,
-        toAddress: testRestaurant.walletAddress,
+        fromAddress: '0x1234567890123456789012345678901234567890',
+        toAddress: '0x0987654321098765432109876543210987654321',
         userId: testUserId,
         restaurantId: testRestaurantId,
         amount: 3,
@@ -71,8 +88,8 @@ describe('Dashboard API Endpoints', () => {
       },
       {
         blockchainHash: '0xtest2',
-        fromAddress: testUser.walletAddress,
-        toAddress: testRestaurant.walletAddress,
+        fromAddress: '0x1234567890123456789012345678901234567890',
+        toAddress: '0x0987654321098765432109876543210987654321',
         userId: testUserId,
         restaurantId: testRestaurantId,
         amount: 2,
@@ -81,8 +98,8 @@ describe('Dashboard API Endpoints', () => {
       },
       {
         blockchainHash: '0xtest3',
-        fromAddress: testUser.walletAddress,
-        toAddress: testRestaurant.walletAddress,
+        fromAddress: '0x1234567890123456789012345678901234567890',
+        toAddress: '0x0987654321098765432109876543210987654321',
         userId: testUserId,
         restaurantId: testRestaurantId,
         amount: 1,
@@ -91,8 +108,37 @@ describe('Dashboard API Endpoints', () => {
       },
     ];
 
-    for (const transaction of transactions) {
-      await prisma.transaction.create({ data: transaction });
+    try {
+      for (const transaction of transactions) {
+        await prisma.transaction.create({ data: transaction });
+      }
+      console.log('Created', transactions.length, 'test transactions');
+    } catch (error) {
+      console.error('Error creating test transactions:', error);
+      throw error;
+    }
+
+    // Validate test data was created properly
+    console.log('Dashboard test setup complete:');
+    console.log('- testUserId:', testUserId);
+    console.log('- testRestaurantId:', testRestaurantId);
+    
+    if (!testUserId) {
+      throw new Error('Test user ID is undefined');
+    }
+    if (!testRestaurantId) {
+      throw new Error('Test restaurant ID is undefined');
+    }
+    
+    // Verify data exists in database
+    const userExists = await prisma.user.findUnique({ where: { id: testUserId } });
+    const restaurantExists = await prisma.restaurant.findUnique({ where: { id: testRestaurantId } });
+    
+    if (!userExists) {
+      throw new Error('Test user not found in database');
+    }
+    if (!restaurantExists) {
+      throw new Error('Test restaurant not found in database');
     }
   });
 
@@ -122,6 +168,7 @@ describe('Dashboard API Endpoints', () => {
 
   describe('GET /api/v1/restaurants/:id/dashboard/daily-stats', () => {
     it('should get daily statistics for a restaurant', async () => {
+      console.log('Test running with testRestaurantId:', testRestaurantId);
       const response = await request(app)
         .get(`/api/v1/restaurants/${testRestaurantId}/dashboard/daily-stats`)
         .expect(200);

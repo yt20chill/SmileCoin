@@ -1,8 +1,6 @@
-import { afterEach, beforeEach, describe, it } from 'node:test';
 import request from 'supertest';
 import App from '../app';
 import { prisma } from '../config/database';
-import { redisClient } from '../config/redis';
 
 describe('Transaction Endpoints', () => {
   let app: App;
@@ -18,10 +16,7 @@ describe('Transaction Endpoints', () => {
     app = new App();
     server = app.getApp();
     
-    // Connect to Redis if not already connected
-    if (!redisClient.isClientConnected()) {
-      await redisClient.connect();
-    }
+    // Redis connection is handled in global setup
 
     // Clean up existing test data
     await prisma.transaction.deleteMany({});
@@ -29,26 +24,29 @@ describe('Transaction Endpoints', () => {
     await prisma.restaurant.deleteMany({});
     await prisma.user.deleteMany({});
 
-    // Create test user
+    // Create test user with unique wallet address
+    const testWallet = `0x${Math.random().toString(16).substr(2, 40)}`;
     testUser = await prisma.user.create({
       data: {
         originCountry: 'USA',
         arrivalDate: new Date('2024-01-01'),
         departureDate: new Date('2024-01-10'),
-        walletAddress: '0x1234567890123456789012345678901234567890',
+        walletAddress: testWallet,
       },
     });
 
-    // Create test restaurant
+    // Create test restaurant with unique identifiers
+    const restaurantWallet = `0x${Math.random().toString(16).substr(2, 40)}`;
+    const uniquePlaceId = `test_place_${Math.random().toString(36).substr(2, 9)}`;
     testRestaurant = await prisma.restaurant.create({
       data: {
-        googlePlaceId: 'test_place_123',
+        googlePlaceId: uniquePlaceId,
         name: 'Test Restaurant',
         address: '123 Test Street, Hong Kong',
         latitude: 22.3193,
         longitude: 114.1694,
-        walletAddress: '0x0987654321098765432109876543210987654321',
-        qrCodeData: 'test_qr_data',
+        walletAddress: restaurantWallet,
+        qrCodeData: `test_qr_data_${Math.random().toString(36).substr(2, 9)}`,
       },
     });
 
@@ -270,13 +268,14 @@ describe('Transaction Endpoints', () => {
 
   describe('GET /api/v1/transactions/validate/:restaurantId', () => {
     beforeEach(async () => {
-      // Create a fresh user for validation tests
+      // Create a fresh user for validation tests with unique wallet address
+      const uniqueWallet = `0x${Math.random().toString(16).substr(2, 40)}`;
       freshUser = await prisma.user.create({
         data: {
           originCountry: 'Canada',
           arrivalDate: new Date('2024-01-01'),
           departureDate: new Date('2024-01-10'),
-          walletAddress: '0x1111111111111111111111111111111111111111',
+          walletAddress: uniqueWallet,
         },
       });
 

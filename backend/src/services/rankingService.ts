@@ -121,37 +121,45 @@ class RankingService {
       ]);
 
       // Add distance calculation and filtering if location parameters are provided
+      let restaurantsWithDistance: any[] = restaurants;
       if (latitude && longitude && radius) {
-        restaurants = restaurants.map(restaurant => {
+        restaurantsWithDistance = restaurants.map(restaurant => {
           const distance = this.calculateDistance(
             latitude, 
             longitude, 
             parseFloat(restaurant.latitude.toString()), 
             parseFloat(restaurant.longitude.toString())
           );
-          restaurant.distance = distance;
           logger.info(`Restaurant ${restaurant.name} distance: ${distance}`);
-          return restaurant;
+          return { ...restaurant, distance };
         }).filter(restaurant => restaurant.distance <= radius);
-        total = restaurants.length;
+        total = restaurantsWithDistance.length;
         logger.info(`Filtered restaurants count: ${total}`);
       }
 
       // Transform to RestaurantRanking format
-      const rankings: RestaurantRanking[] = restaurants.map(restaurant => ({
-        id: restaurant.id,
-        googlePlaceId: restaurant.google_place_id,
-        name: restaurant.name,
-        address: restaurant.address,
-        latitude: parseFloat(restaurant.latitude.toString()),
-        longitude: parseFloat(restaurant.longitude.toString()),
-        walletAddress: restaurant.wallet_address,
-        totalCoinsReceived: Number(restaurant.total_coins_received),
-        rank: Number(restaurant.rank),
-        distance: restaurant.distance ? parseFloat(restaurant.distance.toString()) : undefined,
-        lastRankingUpdate: restaurant.last_ranking_update,
-        createdAt: restaurant.created_at
-      }));
+      const rankings: RestaurantRanking[] = restaurantsWithDistance.map(restaurant => {
+        const ranking = {
+          id: restaurant.id,
+          googlePlaceId: restaurant.google_place_id,
+          name: restaurant.name,
+          address: restaurant.address,
+          latitude: parseFloat(restaurant.latitude.toString()),
+          longitude: parseFloat(restaurant.longitude.toString()),
+          walletAddress: restaurant.wallet_address,
+          totalCoinsReceived: Number(restaurant.total_coins_received),
+          rank: Number(restaurant.rank),
+          distance: restaurant.distance !== undefined ? parseFloat(restaurant.distance.toString()) : undefined,
+          lastRankingUpdate: restaurant.last_ranking_update,
+          createdAt: restaurant.created_at
+        };
+        
+        if (latitude && longitude && radius) {
+          logger.info(`Final ranking for ${restaurant.name}: distance = ${ranking.distance}`);
+        }
+        
+        return ranking;
+      });
 
       const totalPages = Math.ceil(total / take);
       const result: RankingResult = {
@@ -237,22 +245,22 @@ class RankingService {
       ]);
 
       // Add distance calculation if location parameters are provided
+      let restaurantsWithDistance: any[] = restaurants;
       if (latitude && longitude && radius) {
-        restaurants = restaurants.map(restaurant => {
+        restaurantsWithDistance = restaurants.map(restaurant => {
           const distance = this.calculateDistance(
             latitude, 
             longitude, 
             parseFloat(restaurant.latitude.toString()), 
             parseFloat(restaurant.longitude.toString())
           );
-          restaurant.distance = distance;
-          return restaurant;
+          return { ...restaurant, distance };
         }).filter(restaurant => restaurant.distance <= radius);
-        total = restaurants.length;
+        total = restaurantsWithDistance.length;
       }
 
       // Transform to RestaurantRanking format
-      const rankings: RestaurantRanking[] = restaurants.map(restaurant => ({
+      const rankings: RestaurantRanking[] = restaurantsWithDistance.map(restaurant => ({
         id: restaurant.id,
         googlePlaceId: restaurant.google_place_id,
         name: restaurant.name,
@@ -262,7 +270,7 @@ class RankingService {
         walletAddress: restaurant.wallet_address,
         totalCoinsReceived: Number(restaurant.total_coins_received),
         rank: Number(restaurant.origin_rank || 0),
-        distance: restaurant.distance ? parseFloat(restaurant.distance.toString()) : undefined,
+        distance: restaurant.distance !== undefined ? parseFloat(restaurant.distance.toString()) : undefined,
         originSpecificCoins: Number(restaurant.origin_specific_coins || 0),
         originSpecificRank: Number(restaurant.origin_rank || 0),
         lastRankingUpdate: restaurant.last_ranking_update,
